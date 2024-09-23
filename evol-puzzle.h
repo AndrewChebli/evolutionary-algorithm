@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <ctime>
 using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64
@@ -22,3 +25,5 @@ constexpr int TILE_SIZE = 4;
 constexpr int TILES_IN_PUZZLE_COUNT = 64;
 
 void rotateToLeftByOneIndex(int[TILE_SIZE]);
+
+void swapTile(int[TILES_IN_PUZZLE_COUNT][TILE_SIZE]);
