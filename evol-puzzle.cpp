@@ -49,3 +49,55 @@ void swapTile(int arr[TILES_IN_PUZZLE_COUNT][TILE_SIZE]){
         arr[second_index][i] = temp_tile[i];
     }
 }
+
+/**
+ * @brief Reads a puzzle configuration from a file and stores it in a 2D array.
+ * 
+ * This function reads a file containing a puzzle configuration, where each line
+ * represents a tile with digits. It parses the file content and stores the digits
+ * in a 2D array.
+ * 
+ * @param filename The name of the file containing the puzzle configuration.
+ * @param puzzle A 2D array to store the parsed puzzle configuration. The array
+ *               should have dimensions [TILES_IN_PUZZLE_COUNT][TILE_SIZE].
+ * 
+ * @note The function assumes that the file contains the correct number of tiles
+ *       and digits as specified by TILES_IN_PUZZLE_COUNT and TILE_SIZE.
+ * 
+ * @throws runtime_error if the file cannot be opened.
+ */
+void readInput(string filename, int puzzle[TILES_IN_PUZZLE_COUNT][TILE_SIZE]){
+    ifstream file(filename);
+    
+    if (!file) {
+        cerr << "Unable to open file numbers.txt";
+    }
+    
+    // Reading file into a string
+    stringstream buffer;
+    buffer << file.rdbuf();
+    string content = buffer.str();
+
+    file.close();
+
+    // Parsing the content into a 2D vector of digits
+    vector<vector<int>> digitsArray;
+    istringstream stream(content);
+    string number;
+
+    while (stream >> number) {  // Reading each number as a string
+        vector<int> tile;  
+        for (char digit : number) {  // Iterating through each character
+            tile.push_back(digit - '0');  // Converting char to int and adding to row
+        }
+        // Adding the row of digits to the 2D array
+        digitsArray.push_back(tile);
+    }
+
+    // copying from vector<vector<int>> to normal 2d int array
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            puzzle[i][j] = digitsArray[i][j];
+        }
+    }
+}
