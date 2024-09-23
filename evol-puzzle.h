@@ -1,5 +1,5 @@
 #include <iostream>
-
+using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64
 square pieces. The puzzle pieces are provided in an input file. The input file is 64 pieces in a random

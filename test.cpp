@@ -23,5 +23,5 @@ int main(){
     // ---
 
     
-    std::cout << "All tests passed!" << std::endl;
+    cout << "All tests passed!" << std::endl;
 }
