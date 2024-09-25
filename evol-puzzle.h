@@ -1,10 +1,13 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-#include <ctime>
+#include <random>
+#include <chrono>
 #include <vector>
 #include <assert.h>
 #include <sstream>
+#include <vector>
+#include <stdint.h>
 using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64
@@ -26,8 +29,18 @@ The puzzle will be represented as a 1D array of 64 elements. Each element/tile w
 */
 constexpr int TILE_SIZE = 4;
 constexpr int TILES_IN_PUZZLE_COUNT = 64;
+constexpr int POPULATION_SIZE = 100;;
 
-void rotateToLeftByOneIndex(int[TILE_SIZE]);
+/**
+ * @brief Rotates the elements of an array to the left by one index.
+ * 
+ * This function takes an array of integers with a size defined by TILE_SIZE
+ * and shifts all elements one position to the left. The first element of the
+ * array will be moved to the last position.
+ * 
+ * @param arr The array of integers to be rotated. The size of the array is TILE_SIZE.
+ */
+void rotateToLeftByOneIndex(int[]);
 
 /**
  * @brief Swaps two randomly selected tiles(sub-arrays) in a 2D array.
@@ -40,7 +53,8 @@ void rotateToLeftByOneIndex(int[TILE_SIZE]);
  * @param arr A 2D array representing the tiles to be swapped. The array 
  *            dimensions should be TILES_IN_PUZZLE_COUNT x TILE_SIZE.
  */
-void swapTile(int[TILES_IN_PUZZLE_COUNT][TILE_SIZE]);
+//void swapTile(int (&arr)[TILES_IN_PUZZLE_COUNT][TILE_SIZE]);
+void swapTile(int** arr);
 
 /**
  * @brief Reads a puzzle configuration from a file and stores it in a 2D array.
@@ -58,4 +72,13 @@ void swapTile(int[TILES_IN_PUZZLE_COUNT][TILE_SIZE]);
  * 
  * @throws runtime_error if the file cannot be opened.
  */
-void readInput(string, int[TILES_IN_PUZZLE_COUNT][TILE_SIZE]);
+void readInput(string, int** puzzle);
+
+int*** allocatePopulation(int population_size);
+int** allocatePuzzle();
+
+void freePopulation(int*** population_arr, int population_size);
+
+void generatePopulation(int*** population_arr, int** puzzle, int population_size);
+
+int countEdgeMismatch(int** puzzle);
