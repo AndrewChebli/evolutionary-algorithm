@@ -88,7 +88,9 @@ int main(){
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
 
-    cout << "Time taken: " << elapsed.count() << " seconds" << endl;
+    cout << "\nTime taken to count edge mismatches in " << POPULATION_SIZE << "puzzles: " << elapsed.count() << \
+    " seconds \n---> " << elapsed.count()/POPULATION_SIZE << " s/puzzle" << endl;
+    // ---
 
     cout << "\n\n" << "All tests passed!" << "\n\n";
 }

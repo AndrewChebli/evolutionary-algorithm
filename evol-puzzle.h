@@ -27,58 +27,130 @@ represents the left edge.
 /*
 The puzzle will be represented as a 1D array of 64 elements. Each element/tile will be a 4-element array.
 */
-constexpr int TILE_SIZE = 4;
-constexpr int TILES_IN_PUZZLE_COUNT = 64;
-constexpr int POPULATION_SIZE = 100;;
+
 
 /**
- * @brief Rotates the elements of an array to the left by one index.
+ * @brief The size of each tile in the puzzle.
  * 
- * This function takes an array of integers with a size defined by TILE_SIZE
- * and shifts all elements one position to the left. The first element of the
- * array will be moved to the last position.
+ * This constant defines the dimensions of each tile used in the puzzle.
+ * It is set to a value of 4, meaning each tile is 4 units in size.
+ */
+constexpr int TILE_SIZE = 4;
+
+/**
+ * @brief The number of tiles in the puzzle.
  * 
- * @param arr The array of integers to be rotated. The size of the array is TILE_SIZE.
+ * This constant defines the total count of tiles present in the puzzle.
+ * It is used throughout the code to ensure consistency when referring to
+ * the number of tiles in the puzzle.
+ */
+constexpr int TILES_IN_PUZZLE_COUNT = 64;
+
+/**
+ * @brief Rotates the elements of the given array to the left by one index.
+ * 
+ * This function takes an array and shifts all its elements one position to the left.
+ * The first element of the array is moved to the last position.
+ * 
+ * @param arr The array to be rotated. The array should have a size of TILE_SIZE.
  */
 void rotateToLeftByOneIndex(int[]);
 
 /**
- * @brief Swaps two randomly selected tiles(sub-arrays) in a 2D array.
- * 
- * This function selects two distinct random indices within the range of 
- * TILES_IN_PUZZLE_COUNT and swaps the corresponding rows (tiles) in the 
- * provided 2D array. The array is assumed to have dimensions 
- * TILES_IN_PUZZLE_COUNT x TILE_SIZE.
- * 
- * @param arr A 2D array representing the tiles to be swapped. The array 
- *            dimensions should be TILES_IN_PUZZLE_COUNT x TILE_SIZE.
+ * @brief Swaps two random tiles in a 2D array.
+ *
+ * This function selects two distinct random indices within the range of the puzzle tiles
+ * and swaps the tiles at these indices. The random selection is seeded using a high-resolution
+ * clock to ensure variability.
+ *
+ * @param arr A pointer to a 2D array representing the puzzle tiles.
+ *
+ * @note The array is assumed to have a size of TILES_IN_PUZZLE_COUNT x TILE_SIZE.
  */
-//void swapTile(int (&arr)[TILES_IN_PUZZLE_COUNT][TILE_SIZE]);
 void swapTile(int** arr);
 
 /**
- * @brief Reads a puzzle configuration from a file and stores it in a 2D array.
+ * @brief Reads a puzzle input from a file and stores it in a 2D array.
  * 
- * This function reads a file containing a puzzle configuration, where each line
- * represents a tile with digits. It parses the file content and stores the digits
- * in a 2D array.
+ * This function reads the contents of the specified file, parses it into a 2D array of integers,
+ * and stores the result in the provided 2D array `puzzle`.
  * 
- * @param filename The name of the file containing the puzzle configuration.
- * @param puzzle A 2D array to store the parsed puzzle configuration. The array
- *               should have dimensions [TILES_IN_PUZZLE_COUNT][TILE_SIZE].
+ * @param filename The path to the input file containing the puzzle data.
+ * @param puzzle A pointer to a 2D array where the parsed puzzle data will be stored.
  * 
- * @note The function assumes that the file contains the correct number of tiles
- *       and digits as specified by TILES_IN_PUZZLE_COUNT and TILE_SIZE.
+ * @note The input file should contain numbers arranged in a specific format that can be parsed
+ *       into a 2D array of integers.
+ * @note The dimensions of the `puzzle` array should match the expected dimensions defined by
+ *       `TILES_IN_PUZZLE_COUNT` and `TILE_SIZE`.
  * 
- * @throws runtime_error if the file cannot be opened.
+ * @throws runtime_error If the file cannot be opened.
  */
 void readInput(string, int** puzzle);
 
+/**
+ * @brief Allocates memory for a population of individuals.
+ * 
+ * This function allocates a 3D array to represent a population of individuals
+ * for a genetic algorithm or evolutionary computation. Each individual in the 
+ * population is represented by a 2D array.
+ * 
+ * @param population_size The number of individuals in the population.
+ * @return A pointer to the allocated 3D array representing the population.
+ */
 int*** allocatePopulation(int population_size);
+
+/**
+ * @brief Allocates memory for a puzzle.
+ * 
+ * This function dynamically allocates a 2D array to represent a puzzle.
+ * The puzzle is represented as an array of pointers, where each pointer
+ * points to an array of integers. The size of the puzzle and the size
+ * of each tile are determined by the constants TILES_IN_PUZZLE_COUNT
+ * and TILE_SIZE, respectively.
+ * 
+ * @return int** A pointer to the allocated 2D array representing the puzzle.
+ */
 int** allocatePuzzle();
 
+/**
+ * @brief Frees the memory allocated for a population array.
+ * 
+ * This function deallocates the memory used by a 3D array representing a population.
+ * It iterates through the population array and frees each sub-array before freeing
+ * the main population array itself.
+ * 
+ * @param population_arr A pointer to the 3D array representing the population.
+ * @param population_size The size of the population (number of individuals).
+ */
 void freePopulation(int*** population_arr, int population_size);
 
+/**
+ * @brief Generates an initial population for the puzzle solver.
+ *
+ * This function initializes a population array with a given size, where each 
+ * individual in the population is a variation of the initial puzzle configuration.
+ *
+ * @param population_arr A 3D array to store the generated population. The first 
+ *                       dimension represents the population size, the second 
+ *                       dimension represents the tiles in the puzzle, and the 
+ *                       third dimension represents the size of each tile.
+ * @param arr A 2D array representing the initial puzzle configuration. The first 
+ *            dimension represents the tiles in the puzzle, and the second dimension 
+ *            represents the size of each tile.
+ * @param population_size The number of individuals in the population.
+ */
 void generatePopulation(int*** population_arr, int** puzzle, int population_size);
 
+/**
+ * @brief Counts the number of edge mismatches in a given puzzle.
+ *
+ * This function checks the mismatches between adjacent tiles in a puzzle.
+ * It considers both the left and top edges of each tile and compares them
+ * with the corresponding edges of the neighboring tiles.
+ *
+ * @param puzzle A 2D array representing the puzzle, where each tile is an array of edges.
+ *               The edges are assumed to be in the following order:
+ *               [top, right, bottom, left].
+ * @return The total number of edge mismatches in the puzzle.
+ */
 int countEdgeMismatch(int** puzzle);
