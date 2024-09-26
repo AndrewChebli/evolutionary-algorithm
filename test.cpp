@@ -93,4 +93,99 @@ int main(){
     // ---
 
     cout << "\n\n" << "All tests passed!" << "\n\n";
+
+    // --- Test OnePointCrossover
+    int** parent1 = population_arr[0];
+    int** parent2 = population_arr[1];
+    cout << "parent1: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent1[i][j];
+        }
+        cout << " ";
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    cout << "parent2: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent2[i][j] << " ";
+        }
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    onePointCrossover(parent1, parent2);
+
+    cout << "parent1 after crossover: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent1[i][j];
+        }
+        cout << " ";
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    cout << "parent2 after crossover: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent2[i][j];
+        }
+        cout << " ";
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    // --- Test TwoPointCrossover
+    int** parent3 = population_arr[2];
+    int** parent4 = population_arr[3];
+    cout << "parent3: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent3[i][j];
+        }
+        cout << " ";
+
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    cout << "parent4: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent4[i][j];
+        }
+        cout << " ";
+
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    twoPointCrossover(parent3, parent4);
+
+    cout << "parent3 after crossover: " << endl;
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent3[i][j];
+        }
+        cout << " ";
+
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
+    cout << "parent4 after crossover: " << endl;
+
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << parent4[i][j];
+        }
+        cout << " ";
+
+        if((i+1) %8 == 0)
+        cout << endl;
+    }
+
 }

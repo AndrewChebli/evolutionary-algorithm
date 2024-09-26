@@ -154,3 +154,29 @@ void generatePopulation(int*** population_arr, int** puzzle, int population_size
  * @return The total number of edge mismatches in the puzzle.
  */
 int countEdgeMismatch(int** puzzle);
+
+
+/**
+ * @brief Performs a one-point crossover on two parent matrices.
+ * 
+ * This function takes two parent matrices and performs a one-point crossover
+ * to produce offspring. The crossover point is chosen randomly, and the 
+ * elements of the matrices are swapped at that point to create new offspring.
+ * 
+ * @param parent1 A pointer to the first parent matrix.
+ * @param parent2 A pointer to the second parent matrix.
+ */
+void onePointCrossover(int** parent1, int** parent2);
+
+
+/**
+ * @brief Performs a two-point crossover on two parent matrices.
+ *
+ * This function takes two parent matrices and performs a two-point crossover
+ * to generate offspring. The crossover points are chosen randomly, and the
+ * segments between these points are swapped between the two parents.
+ *
+ * @param parent1 A pointer to the first parent matrix.
+ * @param parent2 A pointer to the second parent matrix.
+ */
+void twoPointCrossover(int** parent1, int** parent2);
