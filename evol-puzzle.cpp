@@ -263,7 +263,7 @@ int countEdgeMismatch(int** puzzle){
  * @param parent1 A pointer to the first parent matrix.
  * @param parent2 A pointer to the second parent matrix.
  */
-void onePointCrossover(int** parent1, int** parent2){
+int onePointCrossover(int** parent1, int** parent2){
     // TODO: Create function to take care of random number generation and seeding
     
     // using a high-resolution clock to seed the random number generator
@@ -282,6 +282,8 @@ void onePointCrossover(int** parent1, int** parent2){
             parent2[i][j] = temp;
         }
     }
+
+    return crossover_point;
 }
 
 /**
@@ -295,7 +297,7 @@ void onePointCrossover(int** parent1, int** parent2){
  * @param parent1 A pointer to the first parent matrix.
  * @param parent2 A pointer to the second parent matrix.
  */
-void twoPointCrossover(int ** parent1, int** parent2){
+pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
     // using a high-resolution clock to seed the random number generator
     unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::mt19937 generator(seed); // Mersenne Twister random number generator
@@ -321,4 +323,5 @@ void twoPointCrossover(int ** parent1, int** parent2){
         }
     }
 
+    return make_pair(crossover_point1, crossover_point2);
 }

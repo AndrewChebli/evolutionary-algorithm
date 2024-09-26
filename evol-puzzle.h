@@ -166,7 +166,7 @@ int countEdgeMismatch(int** puzzle);
  * @param parent1 A pointer to the first parent matrix.
  * @param parent2 A pointer to the second parent matrix.
  */
-void onePointCrossover(int** parent1, int** parent2);
+int onePointCrossover(int** parent1, int** parent2);
 
 
 /**
@@ -179,4 +179,4 @@ void onePointCrossover(int** parent1, int** parent2);
  * @param parent1 A pointer to the first parent matrix.
  * @param parent2 A pointer to the second parent matrix.
  */
-void twoPointCrossover(int** parent1, int** parent2);
+pair<int, int>  twoPointCrossover(int** parent1, int** parent2);

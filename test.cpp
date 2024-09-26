@@ -95,97 +95,64 @@ int main(){
     int** parent1 = population_arr[0];
     int** parent2 = population_arr[1];
 
-    cout << "parent1: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent1[i][j];
+    int initialParent1[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+    int initialParent2[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            initialParent1[i][j] = parent1[i][j];
+            initialParent2[i][j] = parent2[i][j];
         }
-        cout << " ";
-        if((i+1) %8 == 0)
-        cout << endl;
     }
 
-    cout << "parent2: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent2[i][j];
+    int crossoverPoint = onePointCrossover(parent1, parent2);
+
+    // Verify the crossover operation
+    for (int i = 0; i < crossoverPoint; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            assertArrayEqual(parent1[i], initialParent1[i]);
+            assertArrayEqual(parent2[i], initialParent2[i]);
         }
-        cout << " ";
-        if((i+1) %8 == 0)
-        cout << endl;
     }
 
-    onePointCrossover(parent1, parent2);
-
-    cout << "parent1 after crossover: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent1[i][j];
+    for (int i = crossoverPoint; i < TILES_IN_PUZZLE_COUNT; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            assertArrayEqual(parent1[i], initialParent2[i]);
+            assertArrayEqual(parent2[i], initialParent1[i]);
         }
-        cout << " ";
-        if((i+1) %8 == 0)
-        cout << endl;
-    }
-
-    cout << "parent2 after crossover: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent2[i][j];
-        }
-        cout << " ";
-        if((i+1) %8 == 0)
-        cout << endl;
     }
 
     // --- Test TwoPointCrossover
     int** parent3 = population_arr[2];
     int** parent4 = population_arr[3];
    
-    cout << "parent3: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent3[i][j];
+   // Capture the initial state of parent3 and parent4
+    int initialParent3[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+    int initialParent4[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            initialParent3[i][j] = parent3[i][j];
+            initialParent4[i][j] = parent4[i][j];
         }
-        cout << " ";
+    }
+    pair<int, int> crossoverPoints = twoPointCrossover(parent3, parent4);
+    int point1 = crossoverPoints.first;
+    int point2 = crossoverPoints.second;
 
-        if((i+1) %8 == 0)
-        cout << endl;
+    // Verify the crossover operation
+    for (int i = 0; i < point1; i++) {
+        assertArrayEqual(parent3[i], initialParent3[i]);
+        assertArrayEqual(parent4[i], initialParent4[i]);
     }
 
-    cout << "parent4: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent4[i][j];
-        }
-        cout << " ";
-
-        if((i+1) %8 == 0)
-        cout << endl;
+    for (int i = point1; i <= point2; i++) {
+        assertArrayEqual(parent3[i], initialParent4[i]);
+        assertArrayEqual(parent4[i], initialParent3[i]);
     }
 
-    twoPointCrossover(parent3, parent4);
-
-    cout << "parent3 after crossover: " << endl;
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent3[i][j];
-        }
-        cout << " ";
-
-        if((i+1) %8 == 0)
-        cout << endl;
-    }
-
-    cout << "parent4 after crossover: " << endl;
-
-    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
-        for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent4[i][j];
-        }
-        cout << " ";
-
-        if((i+1) %8 == 0)
-        cout << endl;
+    for (int i = point2 + 1; i < TILES_IN_PUZZLE_COUNT; i++) {
+        assertArrayEqual(parent3[i], initialParent3[i]);
+        assertArrayEqual(parent4[i], initialParent4[i]);
     }
 
 // ---
