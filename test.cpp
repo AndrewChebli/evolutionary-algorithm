@@ -90,13 +90,11 @@ int main(){
 
     cout << "\nTime taken to count edge mismatches in " << POPULATION_SIZE << "puzzles: " << elapsed.count() << \
     " seconds \n---> " << elapsed.count()/POPULATION_SIZE << " s/puzzle" << endl;
-    // ---
-
-    cout << "\n\n" << "All tests passed!" << "\n\n";
 
     // --- Test OnePointCrossover
     int** parent1 = population_arr[0];
     int** parent2 = population_arr[1];
+
     cout << "parent1: " << endl;
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
         for (int j = 0; j < TILE_SIZE; j++){
@@ -110,8 +108,9 @@ int main(){
     cout << "parent2: " << endl;
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
         for (int j = 0; j < TILE_SIZE; j++){
-            cout << parent2[i][j] << " ";
+            cout << parent2[i][j];
         }
+        cout << " ";
         if((i+1) %8 == 0)
         cout << endl;
     }
@@ -141,6 +140,7 @@ int main(){
     // --- Test TwoPointCrossover
     int** parent3 = population_arr[2];
     int** parent4 = population_arr[3];
+   
     cout << "parent3: " << endl;
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
         for (int j = 0; j < TILE_SIZE; j++){
@@ -188,4 +188,7 @@ int main(){
         cout << endl;
     }
 
+// ---
+
+    cout << "\n\n" << "All tests passed!" << "\n\n";
 }
