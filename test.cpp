@@ -1,5 +1,4 @@
 #include "evol-puzzle.h"
-#include <vector>
 #include <assert.h>
 #include <sstream>
 
@@ -90,7 +89,72 @@ int main(){
 
     cout << "\nTime taken to count edge mismatches in " << POPULATION_SIZE << "puzzles: " << elapsed.count() << \
     " seconds \n---> " << elapsed.count()/POPULATION_SIZE << " s/puzzle" << endl;
-    // ---
+
+    // --- Test OnePointCrossover
+    int** parent1 = population_arr[0];
+    int** parent2 = population_arr[1];
+
+    int initialParent1[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+    int initialParent2[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            initialParent1[i][j] = parent1[i][j];
+            initialParent2[i][j] = parent2[i][j];
+        }
+    }
+
+    int crossoverPoint = onePointCrossover(parent1, parent2);
+
+    // Verify the crossover operation
+    for (int i = 0; i < crossoverPoint; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            assert(assertArrayEqual(parent1[i], initialParent1[i]));
+            assert(assertArrayEqual(parent2[i], initialParent2[i]));
+        }
+    }
+
+    for (int i = crossoverPoint; i < TILES_IN_PUZZLE_COUNT; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            assert(assertArrayEqual(parent1[i], initialParent2[i]));
+            assert(assertArrayEqual(parent2[i], initialParent1[i]));
+        }
+    }
+
+    // --- Test TwoPointCrossover
+    int** parent3 = population_arr[2];
+    int** parent4 = population_arr[3];
+   
+   // Capture the initial state of parent3 and parent4
+    int initialParent3[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+    int initialParent4[TILES_IN_PUZZLE_COUNT][TILE_SIZE];
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++) {
+        for (int j = 0; j < TILE_SIZE; j++) {
+            initialParent3[i][j] = parent3[i][j];
+            initialParent4[i][j] = parent4[i][j];
+        }
+    }
+    pair<int, int> crossoverPoints = twoPointCrossover(parent3, parent4);
+    int point1 = crossoverPoints.first;
+    int point2 = crossoverPoints.second;
+
+    // Verify the crossover operation
+    for (int i = 0; i < point1; i++) {
+        assert(assertArrayEqual(parent3[i], initialParent3[i]));
+        assert(assertArrayEqual(parent4[i], initialParent4[i]));
+    }
+
+    for (int i = point1; i <= point2; i++) {
+        assert(assertArrayEqual(parent3[i], initialParent4[i]));
+        assert(assertArrayEqual(parent4[i], initialParent3[i]));
+    }
+
+    for (int i = point2 + 1; i < TILES_IN_PUZZLE_COUNT; i++) {
+        assert(assertArrayEqual(parent3[i], initialParent3[i]));
+        assert(assertArrayEqual(parent4[i], initialParent4[i]));
+    }
+
+// ---
 
     cout << "\n\n" << "All tests passed!" << "\n\n";
 }

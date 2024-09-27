@@ -28,6 +28,12 @@ int main(){
             }
         }
 
+        // Perform crossovers
+        for (int i = 0; i < POPULATION_SIZE; i += 2) {
+            if (i + 1 < POPULATION_SIZE) {
+                twoPointCrossover(population_arr[i], population_arr[i + 1]);
+            }
+        }
         int edge_mismatch_count = INT_MAX;
 
         for (int i = 0; i < POPULATION_SIZE; i++){

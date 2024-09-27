@@ -252,3 +252,76 @@ int countEdgeMismatch(int** puzzle){
 
     return edge_mismatch;
 }
+
+/**
+ * @brief Performs a one-point crossover on two parent matrices.
+ * 
+ * This function takes two parent matrices and performs a one-point crossover
+ * to generate new offsprings. The crossover point is chosen randomly, and the 
+ * elements of the matrices are swapped at that point to create new offspring.
+ * 
+ * @param parent1 A pointer to the first parent matrix.
+ * @param parent2 A pointer to the second parent matrix.
+ */
+int onePointCrossover(int** parent1, int** parent2){
+    // TODO: Create function to take care of random number generation and seeding
+    
+    // using a high-resolution clock to seed the random number generator
+    unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed); // Mersenne Twister random number generator
+    std::uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
+
+    // Generate the crossover point
+    int crossover_point = distribution(generator);
+
+    // Perform one-point crossover
+    for (int i = crossover_point; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            int temp = parent1[i][j];
+            parent1[i][j] = parent2[i][j];
+            parent2[i][j] = temp;
+        }
+    }
+
+    return crossover_point;
+}
+
+/**
+ * @brief Performs a two-point crossover on two parent matrices.
+ *
+ * This function takes two parent matrices and performs a two-point crossover
+ * to generate new offsprings. The crossover points are randomly selected using
+ * a high-resolution clock to seed the random number generator. The elements
+ * between the two crossover points are swapped between the two parents.
+ *
+ * @param parent1 A pointer to the first parent matrix.
+ * @param parent2 A pointer to the second parent matrix.
+ */
+pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
+    // using a high-resolution clock to seed the random number generator
+    unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed); // Mersenne Twister random number generator
+    std::uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
+
+    // Generate the crossover points
+    int crossover_point1 = distribution(generator);
+    int crossover_point2 = distribution(generator);
+
+    // Ensure CrossoverPoint1 < CrossoverPoint2
+    if (crossover_point1 > crossover_point2){
+        int temp = crossover_point1;
+        crossover_point1 = crossover_point2;
+        crossover_point2 = temp;
+    }
+
+    // Perform two-point crossover
+    for (int i = crossover_point1; i <= crossover_point2; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            int temp = parent1[i][j];
+            parent1[i][j] = parent2[i][j];
+            parent2[i][j] = temp;
+        }
+    }
+
+    return make_pair(crossover_point1, crossover_point2);
+}
