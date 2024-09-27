@@ -7,6 +7,8 @@
 #include <sstream>
 #include <vector>
 #include <stdint.h>
+#include <algorithm>
+#include <utility>
 using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64
@@ -236,4 +238,8 @@ void crossover(int*** population_arr, const int POPULATION_SIZE);
  * @param min_edge_mismatch_count The initial minimum edge mismatch count to compare against.
  * @return The minimum edge mismatch count found in the population.
  */
-int evaluateFitness(int*** population_arr, const int POPULATION_SIZE, int min_edge_mismatch_count);
+vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE);
+
+void selectAndReplaceByTournament(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec);
+
+int calculateDiversity(int*** population_arr, const int POPULATION_SIZE);

@@ -341,11 +341,17 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
     while (generations_performed <= NUM_OF_GENERATIONS){
+
         crossover(population_arr, POPULATION_SIZE);
         mutate(population_arr, POPULATION_SIZE);
-        min_edge_mismatch_count = evaluateFitness(population_arr, POPULATION_SIZE, min_edge_mismatch_count);
 
-        cout << "GEN " << generations_performed << " " << "lowest edge mismatch: "  << min_edge_mismatch_count << endl;
+        vector<pair<int, int>> sorted_index_by_fitness_vec = evaluateFitness(population_arr, POPULATION_SIZE);
+        min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
+
+        selectAndReplaceByTournament(population_arr, POPULATION_SIZE, sorted_index_by_fitness_vec);
+
+        cout << "GEN " << generations_performed << " " << " edge mismatch: "  << sorted_index_by_fitness_vec.back().second \
+        << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
         generations_performed++;
     }
 }
@@ -402,27 +408,39 @@ void crossover(int*** population_arr, const int POPULATION_SIZE){
     }
 }
 
+
 /**
  * @brief Evaluates the fitness of a population of puzzle solutions.
  *
- * This function iterates through a population of puzzle solutions and calculates
- * the edge mismatch count for each solution. It returns the minimum edge mismatch
- * count found in the population, which represents the best fitness score.
+ * This function takes a population of puzzle solutions and evaluates their fitness
+ * by counting the edge mismatches for each solution. It returns a vector of pairs,
+ * where each pair contains the index of the solution and its corresponding fitness
+ * value (edge mismatch count). The vector is sorted in descending order of fitness.
  *
  * @param population_arr A 3D array representing the population of puzzle solutions.
- * @param POPULATION_SIZE The number of puzzle solutions in the population.
- * @param min_edge_mismatch_count The initial minimum edge mismatch count to compare against.
- * @return The minimum edge mismatch count found in the population.
+ * @param POPULATION_SIZE The size of the population.
+ * @return A vector of pairs, where each pair contains the index of the solution and
+ *         its corresponding fitness value, sorted in descending order of fitness.
  */
-int evaluateFitness(int*** population_arr, const int POPULATION_SIZE, int min_edge_mismatch_count){
+vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE){
 
-    int edge_mismatch_count = INT_MAX;
+    vector<pair<int, int>> sorted_index_by_fitness_vec;
 
     for (int i = 0; i < POPULATION_SIZE; i++){
-        edge_mismatch_count = countEdgeMismatch(population_arr[i]);
-        if (edge_mismatch_count <= min_edge_mismatch_count){
-            min_edge_mismatch_count = edge_mismatch_count;
-        }
+        sorted_index_by_fitness_vec.push_back(make_pair(i, countEdgeMismatch(population_arr[i])));
     }
-    return min_edge_mismatch_count;
+
+    sort(sorted_index_by_fitness_vec.begin(), sorted_index_by_fitness_vec.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
+        return a.second > b.second; // sort by edge mismatch count
+    });
+
+    return sorted_index_by_fitness_vec;
+}
+
+void selectAndReplaceByTournament(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec) {
+    // TODO
+}
+
+int calculateDiversity(int*** population_arr, const int POPULATION_SIZE) {
+    // TODO
 }
