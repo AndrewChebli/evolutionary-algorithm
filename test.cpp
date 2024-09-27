@@ -1,5 +1,4 @@
 #include "evol-puzzle.h"
-#include <vector>
 #include <assert.h>
 #include <sstream>
 

@@ -3,7 +3,6 @@
 #include <fstream>
 #include <random>
 #include <chrono>
-#include <vector>
 #include <assert.h>
 #include <sstream>
 #include <vector>
