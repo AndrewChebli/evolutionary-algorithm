@@ -110,15 +110,15 @@ int main(){
     // Verify the crossover operation
     for (int i = 0; i < crossoverPoint; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
-            assertArrayEqual(parent1[i], initialParent1[i]);
-            assertArrayEqual(parent2[i], initialParent2[i]);
+            assert(assertArrayEqual(parent1[i], initialParent1[i]));
+            assert(assertArrayEqual(parent2[i], initialParent2[i]));
         }
     }
 
     for (int i = crossoverPoint; i < TILES_IN_PUZZLE_COUNT; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
-            assertArrayEqual(parent1[i], initialParent2[i]);
-            assertArrayEqual(parent2[i], initialParent1[i]);
+            assert(assertArrayEqual(parent1[i], initialParent2[i]));
+            assert(assertArrayEqual(parent2[i], initialParent1[i]));
         }
     }
 
@@ -141,18 +141,18 @@ int main(){
 
     // Verify the crossover operation
     for (int i = 0; i < point1; i++) {
-        assertArrayEqual(parent3[i], initialParent3[i]);
-        assertArrayEqual(parent4[i], initialParent4[i]);
+        assert(assertArrayEqual(parent3[i], initialParent3[i]));
+        assert(assertArrayEqual(parent4[i], initialParent4[i]));
     }
 
     for (int i = point1; i <= point2; i++) {
-        assertArrayEqual(parent3[i], initialParent4[i]);
-        assertArrayEqual(parent4[i], initialParent3[i]);
+        assert(assertArrayEqual(parent3[i], initialParent4[i]));
+        assert(assertArrayEqual(parent4[i], initialParent3[i]));
     }
 
     for (int i = point2 + 1; i < TILES_IN_PUZZLE_COUNT; i++) {
-        assertArrayEqual(parent3[i], initialParent3[i]);
-        assertArrayEqual(parent4[i], initialParent4[i]);
+        assert(assertArrayEqual(parent3[i], initialParent3[i]));
+        assert(assertArrayEqual(parent4[i], initialParent4[i]));
     }
 
 // ---
