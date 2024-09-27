@@ -154,7 +154,17 @@ int main(){
         assert(assertArrayEqual(parent4[i], initialParent4[i]));
     }
 
-// ---
+    // ---
+
+    // --- Test evaluateFitness
+    vector<pair<int, int>> fitness_results = evaluateFitness(population_arr, POPULATION_SIZE);
+
+    // checking if sorted properly
+    for (int i = 1; i < fitness_results.size(); i++) {
+        assert(fitness_results[i-1].second >= fitness_results[i].second);
+    }
 
     cout << "\n\n" << "All tests passed!" << "\n\n";
+
+    return 0;
 }

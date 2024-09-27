@@ -443,4 +443,6 @@ void selectAndReplaceByTournament(int*** population_arr, const int POPULATION_SI
 
 int calculateDiversity(int*** population_arr, const int POPULATION_SIZE) {
     // TODO
+
+    return 0;
 }
