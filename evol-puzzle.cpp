@@ -315,7 +315,7 @@ pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
     }
 
     // Perform two-point crossover
-    for (int i = crossover_point1; i < crossover_point2; i++){
+    for (int i = crossover_point1; i <= crossover_point2; i++){
         for (int j = 0; j < TILE_SIZE; j++){
             int temp = parent1[i][j];
             parent1[i][j] = parent2[i][j];
