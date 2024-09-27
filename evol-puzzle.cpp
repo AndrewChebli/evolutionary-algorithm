@@ -150,25 +150,22 @@ int** allocatePuzzle() {
     return puzzle;
 }
 
+void freePuzzle(int** puzzle) {
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; ++i) {
+        delete[] puzzle[i];
+    }
+    delete[] puzzle;
+}
 
-/**
- * @brief Frees the memory allocated for a population array.
- * 
- * This function deallocates the memory used by a 3D array representing a population.
- * It iterates through the population array and frees each sub-array before freeing
- * the main population array itself.
- * 
- * @param population_arr A pointer to the 3D array representing the population.
- * @param population_size The size of the population (number of individuals).
- */
+
 void freePopulation(int*** population_arr, int population_size) {
-    for (int i = 0; i < population_size; ++i) {
-        for (int j = 0; j < TILES_IN_PUZZLE_COUNT; ++j) {
+    for (int i = 0; i < population_size; i++) {
+        for (int j = 0; j < TILES_IN_PUZZLE_COUNT; j++) {
             delete[] population_arr[i][j];
         }
-        delete[] (*population_arr)[i]; 
+        delete[] population_arr[i];
     }
-    delete[] *population_arr;
+    delete[] population_arr;
 }
 
 
@@ -214,6 +211,8 @@ void generatePopulation(int*** population_arr, int** arr, int population_size){
                 }
             }
         }
+
+        freePuzzle(arr_copy);
 }
 
 
@@ -263,7 +262,7 @@ int countEdgeMismatch(int** puzzle){
  * @param parent1 A pointer to the first parent matrix.
  * @param parent2 A pointer to the second parent matrix.
  */
-int onePointCrossover(int** parent1, int** parent2){
+int onePointCrossover(int** offspring1, int** offspring2){
     // TODO: Create function to take care of random number generation and seeding
     
     // using a high-resolution clock to seed the random number generator
@@ -277,9 +276,9 @@ int onePointCrossover(int** parent1, int** parent2){
     // Perform one-point crossover
     for (int i = crossover_point; i < TILES_IN_PUZZLE_COUNT; i++){
         for (int j = 0; j < TILE_SIZE; j++){
-            int temp = parent1[i][j];
-            parent1[i][j] = parent2[i][j];
-            parent2[i][j] = temp;
+            int temp = offspring1[i][j];
+            offspring1[i][j] = offspring2[i][j];
+            offspring2[i][j] = temp;
         }
     }
 
@@ -297,7 +296,7 @@ int onePointCrossover(int** parent1, int** parent2){
  * @param parent1 A pointer to the first parent matrix.
  * @param parent2 A pointer to the second parent matrix.
  */
-pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
+pair<int, int>  twoPointCrossover(int** offspring1, int** offspring2){
     // using a high-resolution clock to seed the random number generator
     unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::mt19937 generator(seed); // Mersenne Twister random number generator
@@ -317,9 +316,9 @@ pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
     // Perform two-point crossover
     for (int i = crossover_point1; i <= crossover_point2; i++){
         for (int j = 0; j < TILE_SIZE; j++){
-            int temp = parent1[i][j];
-            parent1[i][j] = parent2[i][j];
-            parent2[i][j] = temp;
+            int temp = offspring1[i][j];
+            offspring1[i][j] = offspring2[i][j];
+            offspring2[i][j] = temp;
         }
     }
 
@@ -340,20 +339,46 @@ pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
 void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE){
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
+    float ratio = 0.5;
+    int** best_puzzle_so_far = allocatePuzzle();
+    int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
     while (generations_performed <= NUM_OF_GENERATIONS){
 
-        crossover(population_arr, POPULATION_SIZE);
-        mutate(population_arr, POPULATION_SIZE);
+        // Step 2: Evaluate Fitness
+        vector<pair<int, int>> sorted_index_by_fitness_vec = evaluateFitness(population_arr, POPULATION_SIZE); //<index, edgeMismatchCount>
 
-        vector<pair<int, int>> sorted_index_by_fitness_vec = evaluateFitness(population_arr, POPULATION_SIZE);
+        if (sorted_index_by_fitness_vec.back().second < min_edge_mismatch_count){
+            best_puzzle_so_far = population_arr[sorted_index_by_fitness_vec.back().first];
+            printPuzzle(best_puzzle_so_far);
+        }
+
         min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
 
-        selectAndReplaceByTournament(population_arr, POPULATION_SIZE, sorted_index_by_fitness_vec);
+        // Step 3: Termination Criteria
+        if (min_edge_mismatch_count == 0){
+            int index_of_perfect_solution = sorted_index_by_fitness_vec.back().first;
+            // TODO: output best_puzzle_so_far to file
+        }
+        
+        // Step 4: Select Parents
+        pair<vector<int>, vector<int>> parents_and_worst_indexes_pair = selectParentsAndWorst(population_arr, POPULATION_SIZE, sorted_index_by_fitness_vec, ratio);
+        vector<int> parent_index_vec = parents_and_worst_indexes_pair.first;
+        vector<int> worst_index_vec = parents_and_worst_indexes_pair.second;
+
+        // Step 5: Offspring generation
+        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr);
+        mutate(offspring_arr, POPULATION_SIZE * ratio);
+
+        // Step 6: Survivor Selection
+        selectSurvivorsAndReplace(population_arr, POPULATION_SIZE, worst_index_vec, offspring_arr);
 
         cout << "GEN " << generations_performed << " " << " edge mismatch: "  << sorted_index_by_fitness_vec.back().second \
         << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
         generations_performed++;
     }
+
+    freePuzzle(best_puzzle_so_far);
+    freePopulation(offspring_arr, POPULATION_SIZE * ratio);
 }
 
 /**
@@ -372,7 +397,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  * - Rotates a randomly selected tile to the left by one index.
  * - Swaps tiles within the puzzle.
  */
-void mutate(int*** population_arr, const int POPULATION_SIZE){
+void mutate(int*** offspring_arr, const int POPULATION_SIZE){
     for (int i = 0; i < POPULATION_SIZE; i++){
         unsigned seed = chrono::high_resolution_clock::now().time_since_epoch().count();
         mt19937 generator(seed); // Mersenne Twister random number generator
@@ -380,11 +405,11 @@ void mutate(int*** population_arr, const int POPULATION_SIZE){
 
         int num_iterations = distribution(generator);
         for (int j = 0; j < num_iterations; j++){
-            rotateToLeftByOneIndex(population_arr[i][distribution(generator)]);
+            rotateToLeftByOneIndex(offspring_arr[i][distribution(generator)]);
         }
 
         for (int j = 0; j < num_iterations; j++){
-            swapTile(population_arr[i]);
+            swapTile(offspring_arr[i]);
         }
     }
 }
@@ -400,12 +425,27 @@ void mutate(int*** population_arr, const int POPULATION_SIZE){
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE){
-    for (int i = 0; i < POPULATION_SIZE; i += 2) {
-        if (i + 1 < POPULATION_SIZE) {
-            twoPointCrossover(population_arr[i], population_arr[i + 1]);
+void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> parent_index_vec, int*** offspring_arr){
+    int parent_index_vec_size = parent_index_vec.size();
+
+    int** offspring1 = allocatePuzzle();
+    int** offspring2 = allocatePuzzle();
+
+    for (int i = 0; i < parent_index_vec_size; i += 2) {
+        if (i + 1 < parent_index_vec_size) {
+            copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
+            copyPuzzle(population_arr[parent_index_vec[i + 1]], offspring2);
+
+            twoPointCrossover(offspring1, offspring2);
+
+            copyPuzzle(offspring1, offspring_arr[i]);
+            copyPuzzle(offspring2, offspring_arr[i + 1]);
         }
     }
+
+    freePuzzle(offspring1);
+    freePuzzle(offspring2);
+
 }
 
 
@@ -437,12 +477,65 @@ vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATI
     return sorted_index_by_fitness_vec;
 }
 
-void selectAndReplaceByTournament(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec) {
-    // TODO
+pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec, const float ratio){
+    
+    // ratio is percentage of top ranking puzzles to select as parents
+    int starting_point_parents = POPULATION_SIZE - POPULATION_SIZE * ratio;
+    int threshold_worst = POPULATION_SIZE * ratio;
+
+    vector<int> parents_index_vec;
+    for (int i = starting_point_parents; i < POPULATION_SIZE; i++){
+        parents_index_vec.push_back(sorted_index_by_fitness_vec[i].first);
+    }
+
+    vector<int> worst_index_vec;
+    for (int i = 0; i < threshold_worst; i++){
+        worst_index_vec.push_back(sorted_index_by_fitness_vec[i].first);
+    }
+
+    return make_pair(parents_index_vec, worst_index_vec);
+}
+
+void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, vector<int> worst_index_vec, int*** offspring_arr){
+    int size = worst_index_vec.size();
+    for (int i = 0; i < size; i++){
+        copyPuzzle(offspring_arr[i], population_arr[worst_index_vec[i]]);
+    }
 }
 
 int calculateDiversity(int*** population_arr, const int POPULATION_SIZE) {
     // TODO
 
     return 0;
+}
+
+void copyPuzzle(int** source_puzzle, int** copy_puzzle){
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        for (int j = 0; j < TILE_SIZE; j++){
+            copy_puzzle[i][j] = source_puzzle[i][j];
+        }
+    }
+}
+
+void writePuzzleIntoPopulation(int*** destination_population, int POPULATION_SIZE, int** source_puzzle){
+    for (int i = 0; i < POPULATION_SIZE; i++){
+        for (int j = 0; j < TILES_IN_PUZZLE_COUNT; j++){
+            for (int p = 0; p < TILE_SIZE; p++){
+                destination_population[i][j][p] = source_puzzle[j][p];
+            }
+        }
+    }
+}
+
+void printPuzzle(int** puzzle){
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        if (i % 8 == 0){
+            cout << endl;
+        }
+        for (int j = 0; j < TILE_SIZE; j++){
+            cout << puzzle[i][j];
+        }
+        cout << " ";
+    }
+    cout << "\n\n";
 }

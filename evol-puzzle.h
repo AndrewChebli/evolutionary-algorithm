@@ -211,7 +211,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  * - Rotates a randomly selected tile to the left by one index.
  * - Swaps tiles within the puzzle.
  */
-void mutate(int*** population_arr, const int POPULATION_SIZE);
+void mutate(int*** offspring_arr, const int POPULATION_SIZE);
 
 /**
  * @brief Performs crossover operation on a population array.
@@ -224,7 +224,7 @@ void mutate(int*** population_arr, const int POPULATION_SIZE);
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE);
+void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> parent_indexes_vec, int*** offspring_arr);
 
 /**
  * @brief Evaluates the fitness of a population of puzzle solutions.
@@ -240,6 +240,14 @@ void crossover(int*** population_arr, const int POPULATION_SIZE);
  */
 vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE);
 
-void selectAndReplaceByTournament(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec);
+pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec, const float ratio);
+
+void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, vector<int> worst_index_vec, int*** offspring_arr);
 
 int calculateDiversity(int*** population_arr, const int POPULATION_SIZE);
+
+void copyPuzzle(int** source_puzzle, int** copy_puzzle);
+
+void writePuzzleIntoPopulation(int***, const int POPULATION_SIZE, int**);
+
+void printPuzzle(int** puzzle);
