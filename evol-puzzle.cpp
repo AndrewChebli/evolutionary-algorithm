@@ -325,3 +325,104 @@ pair<int, int>  twoPointCrossover(int ** parent1, int** parent2){
 
     return make_pair(crossover_point1, crossover_point2);
 }
+
+/**
+ * @brief Evolves a population of solutions over a specified number of generations.
+ *
+ * This function performs genetic algorithm operations such as crossover and mutation
+ * on a population of solutions. It evaluates the fitness of the population after each
+ * generation and tracks the minimum edge mismatch count.
+ *
+ * @param population_arr A pointer to a 3D array representing the population of solutions.
+ * @param NUM_OF_GENERATIONS The number of generations to evolve the population.
+ * @param POPULATION_SIZE The size of the population.
+ */
+void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE){
+    int min_edge_mismatch_count = INT_MAX;
+    int generations_performed = 1;
+    while (generations_performed <= NUM_OF_GENERATIONS){
+        crossover(population_arr, POPULATION_SIZE);
+        mutate(population_arr, POPULATION_SIZE);
+        min_edge_mismatch_count = evaluateFitness(population_arr, POPULATION_SIZE, min_edge_mismatch_count);
+
+        cout << "GEN " << generations_performed << " " << "lowest edge mismatch: "  << min_edge_mismatch_count << endl;
+        generations_performed++;
+    }
+}
+
+/**
+ * @brief Mutates a population of puzzles by performing random rotations and swaps.
+ * 
+ * This function iterates over each puzzle in the population and performs a series of 
+ * random rotations and swaps on the tiles within each puzzle. The number of rotations 
+ * and swaps is determined randomly for each puzzle.
+ * 
+ * @param population_arr A 3D array representing the population of puzzles.
+ * @param POPULATION_SIZE The number of puzzles in the population.
+ * 
+ * The function uses the Mersenne Twister random number generator to ensure high-quality 
+ * randomness. For each puzzle, it generates a random number of iterations and performs 
+ * the following operations:
+ * - Rotates a randomly selected tile to the left by one index.
+ * - Swaps tiles within the puzzle.
+ */
+void mutate(int*** population_arr, const int POPULATION_SIZE){
+    for (int i = 0; i < POPULATION_SIZE; i++){
+        unsigned seed = chrono::high_resolution_clock::now().time_since_epoch().count();
+        mt19937 generator(seed); // Mersenne Twister random number generator
+        uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
+
+        int num_iterations = distribution(generator);
+        for (int j = 0; j < num_iterations; j++){
+            rotateToLeftByOneIndex(population_arr[i][distribution(generator)]);
+        }
+
+        for (int j = 0; j < num_iterations; j++){
+            swapTile(population_arr[i]);
+        }
+    }
+}
+
+/**
+ * @brief Performs crossover operation on a population array.
+ * 
+ * This function iterates through the population array in pairs and applies
+ * a two-point crossover operation on each pair. The crossover is performed
+ * only if there is a valid pair (i.e., the second individual in the pair exists).
+ * 
+ * @param population_arr A pointer to the population array, where each individual
+ *                       is represented as a pointer to an array of integers.
+ * @param POPULATION_SIZE The size of the population array.
+ */
+void crossover(int*** population_arr, const int POPULATION_SIZE){
+    for (int i = 0; i < POPULATION_SIZE; i += 2) {
+        if (i + 1 < POPULATION_SIZE) {
+            twoPointCrossover(population_arr[i], population_arr[i + 1]);
+        }
+    }
+}
+
+/**
+ * @brief Evaluates the fitness of a population of puzzle solutions.
+ *
+ * This function iterates through a population of puzzle solutions and calculates
+ * the edge mismatch count for each solution. It returns the minimum edge mismatch
+ * count found in the population, which represents the best fitness score.
+ *
+ * @param population_arr A 3D array representing the population of puzzle solutions.
+ * @param POPULATION_SIZE The number of puzzle solutions in the population.
+ * @param min_edge_mismatch_count The initial minimum edge mismatch count to compare against.
+ * @return The minimum edge mismatch count found in the population.
+ */
+int evaluateFitness(int*** population_arr, const int POPULATION_SIZE, int min_edge_mismatch_count){
+
+    int edge_mismatch_count = INT_MAX;
+
+    for (int i = 0; i < POPULATION_SIZE; i++){
+        edge_mismatch_count = countEdgeMismatch(population_arr[i]);
+        if (edge_mismatch_count <= min_edge_mismatch_count){
+            min_edge_mismatch_count = edge_mismatch_count;
+        }
+    }
+    return min_edge_mismatch_count;
+}
