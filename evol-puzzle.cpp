@@ -465,7 +465,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         vector<int> worst_index_vec = parents_and_worst_indexes_pair.second;
 
         // Step 5: Offspring generation
-        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr);
+        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap);
         mutate(offspring_arr, POPULATION_SIZE * ratio);
 
         // Step 6: Survivor Selection
@@ -524,7 +524,7 @@ void mutate(int*** offspring_arr, const int POPULATION_SIZE){
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> parent_index_vec, int*** offspring_arr){
+void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> parent_index_vec, int*** offspring_arr, unordered_map<string, int> duplicatesMap){
     int parent_index_vec_size = parent_index_vec.size();
 
     int** offspring1 = allocatePuzzle();
