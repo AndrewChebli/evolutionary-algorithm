@@ -15,7 +15,7 @@ int main(){
     generatePopulation(population_arr, puzzle, POPULATION_SIZE);
 
     // Step 2-6 
-    evolve(population_arr, NUM_OF_GENERATIONS, POPULATION_SIZE);
+    evolve(population_arr, NUM_OF_GENERATIONS, POPULATION_SIZE, duplicatesMap);
 
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;

@@ -434,7 +434,7 @@ pair<int, int>  twoPointCrossover(int** offspring1, int** offspring2){
  * @param NUM_OF_GENERATIONS The number of generations to evolve the population.
  * @param POPULATION_SIZE The size of the population.
  */
-void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE){
+void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, unordered_map<string, int> duplicatesMap){
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
     float ratio = 0.5;

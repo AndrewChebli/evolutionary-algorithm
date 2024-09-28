@@ -243,7 +243,7 @@ pair<int, int>  twoPointCrossover(int** parent1, int** parent2);
  * @param NUM_OF_GENERATIONS The number of generations to evolve the population.
  * @param POPULATION_SIZE The size of the population.
  */
-void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE);
+void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, unordered_map<string, int> duplicatesMap);
 
 /**
  * @brief Mutates a population of puzzles by performing random rotations and swaps.
