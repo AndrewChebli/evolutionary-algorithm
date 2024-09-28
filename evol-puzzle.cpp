@@ -200,6 +200,7 @@ void generatePopulation(int*** population_arr, int** arr, int population_size){
             }
         }
 
+        #pragma omp parallel for
         for (int i = 1; i < population_size; i++){
             for (int j = 0; j < TILES_IN_PUZZLE_COUNT/2; j++){
                 swapTile(arr_copy);
@@ -350,14 +351,14 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         if (sorted_index_by_fitness_vec.back().second < min_edge_mismatch_count){
             best_puzzle_so_far = population_arr[sorted_index_by_fitness_vec.back().first];
             printPuzzle(best_puzzle_so_far);
+            savePuzzle(best_puzzle_so_far);
         }
 
         min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
 
-        // Step 3: Termination Criteria
+        // Step 3: Termination Criteria (either best solution found or all generations elapsed)
         if (min_edge_mismatch_count == 0){
-            int index_of_perfect_solution = sorted_index_by_fitness_vec.back().first;
-            // TODO: output best_puzzle_so_far to file
+            break;
         }
         
         // Step 4: Select Parents
@@ -538,4 +539,26 @@ void printPuzzle(int** puzzle){
         cout << " ";
     }
     cout << "\n\n";
+}
+
+void savePuzzle(int** puzzle) {
+    ofstream file("Ass1Output.txt");
+    if (!file) {
+        cerr << "Unable to open file Ass1Output.txt for writing";
+        return;
+    }
+
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++) {
+        if (i % 8 == 0 && i != 0) {
+            file << endl;
+        }
+        for (int j = 0; j < TILE_SIZE; j++) {
+            file << puzzle[i][j];
+        }
+        if ((i + 1) % 8 != 0) {
+            file << " ";
+        }
+    }
+    file << "\n\n";
+    file.close();
 }

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <random>
 #include <chrono>
+#include <climits>
 #include <assert.h>
 #include <sstream>
 #include <vector>
@@ -251,3 +252,5 @@ void copyPuzzle(int** source_puzzle, int** copy_puzzle);
 void writePuzzleIntoPopulation(int***, const int POPULATION_SIZE, int**);
 
 void printPuzzle(int** puzzle);
+
+void savePuzzle(int** puzzle);
