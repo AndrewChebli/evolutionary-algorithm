@@ -110,8 +110,20 @@ unordered_map<string, int> recordDuplicateTiles(int** puzzle){
             duplicatesMap[hit_key] = duplicatesMap[hit_key] + 1;
         }
     }
+
+    // removing elements from map that are not duplicates
+    for (auto it = duplicatesMap.begin(); it != duplicatesMap.end();){
+        if (it->second == 1){
+            it = duplicatesMap.erase(it);
+        }
+        else{
+            it++;
+        }
+    }
+
     return duplicatesMap; 
 }
+
 
 /**
  * @brief Swaps two random tiles in a 2D array.
@@ -245,6 +257,14 @@ int** allocatePuzzle() {
     return puzzle;
 }
 
+/**
+ * @brief Frees the memory allocated for a 2D puzzle array.
+ * 
+ * This function deallocates the memory for each row of the puzzle
+ * and then deallocates the memory for the array of row pointers.
+ * 
+ * @param puzzle A pointer to the 2D array representing the puzzle.
+ */
 void freePuzzle(int** puzzle) {
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; ++i) {
         delete[] puzzle[i];

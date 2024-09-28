@@ -164,6 +164,16 @@ int*** allocatePopulation(int population_size);
 int** allocatePuzzle();
 
 /**
+ * @brief Frees the memory allocated for a 2D puzzle array.
+ * 
+ * This function deallocates the memory for each row of the puzzle
+ * and then deallocates the memory for the array of row pointers.
+ * 
+ * @param puzzle A pointer to the 2D array representing the puzzle.
+ */
+void freePuzzle(int** puzzle);
+
+/**
  * @brief Frees the memory allocated for a population array.
  * 
  * This function deallocates the memory used by a 3D array representing a population.
