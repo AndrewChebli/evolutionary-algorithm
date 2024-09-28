@@ -8,6 +8,7 @@ int main(){
     readInput("Ass1Input.txt", puzzle);
     int POPULATION_SIZE = 1000;
     int NUM_OF_GENERATIONS = 100000;
+    unordered_map<string, int> duplicatesMap = recordDuplicateTiles(puzzle);
     int*** population_arr = allocatePopulation(POPULATION_SIZE);
 
     // Step 1: Initialization

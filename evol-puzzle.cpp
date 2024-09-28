@@ -17,6 +17,63 @@ void rotateToLeftByOneIndex(int arr[]){
     arr[TILE_SIZE - 1] = temp;
 }
 
+vector<int> rotateToLeftByOneIndexReturn(vector<int> &tile){
+    int temp = tile[0];
+    for (int i = 0; i < TILE_SIZE - 1; i++){
+        tile[i] = tile[i+1];
+    }
+    tile[TILE_SIZE - 1] = temp; 
+    
+    return tile;
+}
+
+vector<int> convertTileToVector(int arr[]){
+    vector<int> vec(TILE_SIZE);
+    
+    for (int i = 0; i < TILE_SIZE; i++){
+        vec[i] = arr[i];
+    }
+
+    return vec;
+}
+
+string convertTileToString(vector<int> vec){
+    string result;
+    for (int i = 0; i < TILE_SIZE; i++){
+        result += to_string(vec[i]);
+    }
+    return result;
+}
+
+unordered_map<string, int> recordDuplicateTiles(int** puzzle){
+    unordered_map<string, int> duplicatesMap;
+
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        vector<int> tile = convertTileToVector(puzzle[i]);
+        vector<string> tile_rotations_vec(TILE_SIZE);
+        
+        tile_rotations_vec[0] = convertTileToString(tile);
+
+        for (int j = 1; j < TILE_SIZE; j++){
+            tile_rotations_vec[j] = convertTileToString(rotateToLeftByOneIndexReturn(tile));
+        }
+
+        string hit_key = "";
+        for (int j = 0; j < tile_rotations_vec.size(); j++){
+            if (duplicatesMap.find(tile_rotations_vec[j]) != duplicatesMap.end()){
+                hit_key = tile_rotations_vec[j];
+            }
+        }
+
+        if (hit_key == ""){
+            duplicatesMap[tile_rotations_vec[0]] = 1;
+        }
+        else{
+            duplicatesMap[hit_key] = duplicatesMap[hit_key] + 1;
+        }
+    }
+    return duplicatesMap; 
+}
 
 /**
  * @brief Swaps two random tiles in a 2D array.
@@ -212,7 +269,7 @@ void generatePopulation(int*** population_arr, int** arr, int population_size){
                 }
             }
         }
-
+        
         freePuzzle(arr_copy);
 }
 
@@ -286,6 +343,7 @@ int onePointCrossover(int** offspring1, int** offspring2){
     return crossover_point;
 }
 
+
 /**
  * @brief Performs a two-point crossover on two parent matrices.
  *
@@ -326,6 +384,7 @@ pair<int, int>  twoPointCrossover(int** offspring1, int** offspring2){
     return make_pair(crossover_point1, crossover_point2);
 }
 
+
 /**
  * @brief Evolves a population of solutions over a specified number of generations.
  *
@@ -343,7 +402,8 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     float ratio = 0.5;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
-    while (generations_performed <= NUM_OF_GENERATIONS){
+    while (min_edge_mismatch_count != 0){
+    //while (generations_performed <= NUM_OF_GENERATIONS){
 
         // Step 2: Evaluate Fitness
         vector<pair<int, int>> sorted_index_by_fitness_vec = evaluateFitness(population_arr, POPULATION_SIZE); //<index, edgeMismatchCount>

@@ -6,10 +6,13 @@
 #include <climits>
 #include <assert.h>
 #include <sstream>
+#include <set>
+#include <unordered_set>
 #include <vector>
 #include <stdint.h>
 #include <algorithm>
 #include <utility>
+#include <cmath>
 using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64
@@ -57,6 +60,14 @@ constexpr int TILES_IN_PUZZLE_COUNT = 64;
  * @param arr The array to be rotated. The array should have a size of TILE_SIZE.
  */
 void rotateToLeftByOneIndex(int[]);
+
+vector<int> rotateToLeftByOneIndexReturn(vector<int> &tile);
+
+vector<int> convertTileToVector(int arr[]);
+
+string convertTileToString(vector<int> vec);
+
+unordered_map<string, int> recordDuplicateTiles(int** puzzle);
 
 /**
  * @brief Swaps two random tiles in a 2D array.
