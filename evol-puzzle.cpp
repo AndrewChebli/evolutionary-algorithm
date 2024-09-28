@@ -17,6 +17,15 @@ void rotateToLeftByOneIndex(int arr[]){
     arr[TILE_SIZE - 1] = temp;
 }
 
+/**
+ * @brief Rotates the elements of the given vector to the left by one index.
+ *
+ * This function takes a reference to a vector of integers and rotates its elements
+ * to the left by one position. The first element of the vector is moved to the end.
+ *
+ * @param tile A reference to a vector of integers to be rotated.
+ * @return A vector of integers after rotating the elements to the left by one index.
+ */
 vector<int> rotateToLeftByOneIndexReturn(vector<int> &tile){
     int temp = tile[0];
     for (int i = 0; i < TILE_SIZE - 1; i++){
@@ -27,6 +36,16 @@ vector<int> rotateToLeftByOneIndexReturn(vector<int> &tile){
     return tile;
 }
 
+/**
+ * @brief Converts an array of integers to a vector of integers.
+ * 
+ * This function takes an array of integers and converts it into a 
+ * std::vector<int> of the same size. The size of the array is 
+ * determined by the constant TILE_SIZE.
+ * 
+ * @param arr The input array of integers to be converted.
+ * @return std::vector<int> A vector containing the elements of the input array.
+ */
 vector<int> convertTileToVector(int arr[]){
     vector<int> vec(TILE_SIZE);
     
@@ -37,6 +56,15 @@ vector<int> convertTileToVector(int arr[]){
     return vec;
 }
 
+/**
+ * @brief Converts a vector of integers representing a tile into a string.
+ * 
+ * This function takes a vector of integers and concatenates each integer
+ * into a single string. The size of the vector is assumed to be TILE_SIZE.
+ * 
+ * @param vec A vector of integers representing the tile.
+ * @return A string representation of the tile.
+ */
 string convertTileToString(vector<int> vec){
     string result;
     for (int i = 0; i < TILE_SIZE; i++){
@@ -45,6 +73,16 @@ string convertTileToString(vector<int> vec){
     return result;
 }
 
+/**
+ * @brief Records duplicate tiles in a puzzle.
+ *
+ * This function takes a 2D array representing a puzzle and records the number of duplicate tiles.
+ * Each tile is converted to a vector and then to a string representation. The function considers
+ * all possible rotations of each tile to identify duplicates.
+ *
+ * @param puzzle A 2D array representing the puzzle.
+ * @return An unordered_map where the keys are string representations of tiles and the values are the counts of duplicates.
+ */
 unordered_map<string, int> recordDuplicateTiles(int** puzzle){
     unordered_map<string, int> duplicatesMap;
 
