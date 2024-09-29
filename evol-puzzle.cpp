@@ -646,7 +646,9 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         if (sorted_index_by_fitness_vec.back().second < min_edge_mismatch_count){
             best_puzzle_so_far = population_arr[sorted_index_by_fitness_vec.back().first];
             printPuzzle(best_puzzle_so_far);
-            savePuzzle(best_puzzle_so_far, sorted_index_by_fitness_vec.back().second);
+            if (sorted_index_by_fitness_vec.back().second <= 25){
+                savePuzzle(best_puzzle_so_far, sorted_index_by_fitness_vec.back().second);
+            }
         }
 
         min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
