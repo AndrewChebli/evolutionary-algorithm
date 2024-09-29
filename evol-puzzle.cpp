@@ -633,6 +633,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
     int stagnated_generation_count = 0;
+    const int stagnation_threshold = 1000;
     float ratio = 0.5;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
@@ -654,9 +655,9 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         }
 
         // when fitness plateaus, will regenerate population with the best puzzle so far as the seed
-        if (++stagnated_generation_count == 1000 || stagnated_generation_count == 10000 || stagnated_generation_count == 100000){
+        if (++stagnated_generation_count == stagnation_threshold || stagnated_generation_count == stagnation_threshold * 10 || stagnated_generation_count == stagnation_threshold * 100){
             generatePopulation(population_arr, best_puzzle_so_far, POPULATION_SIZE, random);
-            if (stagnated_generation_count == 100000){
+            if (stagnated_generation_count == stagnation_threshold * 100){
                 stagnated_generation_count = 0;
             }
         }
