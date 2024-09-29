@@ -632,6 +632,7 @@ void orderCrossover(int** offspring1, int** offspring2, const unordered_map<stri
 void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles,pair<mt19937, uniform_int_distribution<int>> random){
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
+    int stagnated_generation_count = 0;
     float ratio = 0.5;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
@@ -648,6 +649,15 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
             printPuzzle(best_puzzle_so_far);
             if (sorted_index_by_fitness_vec.back().second <= 25){
                 savePuzzle(best_puzzle_so_far, sorted_index_by_fitness_vec.back().second);
+            }
+            stagnated_generation_count = 0;
+        }
+
+        // when fitness plateaus, will regenerate population with the best puzzle so far as the seed
+        if (++stagnated_generation_count == 1000 || stagnated_generation_count == 10000 || stagnated_generation_count == 100000){
+            generatePopulation(population_arr, best_puzzle_so_far, POPULATION_SIZE, random);
+            if (stagnated_generation_count == 100000){
+                stagnated_generation_count = 0;
             }
         }
 
