@@ -107,6 +107,9 @@ string convertTileToString(vector<int> vec);
  */
 unordered_map<string, int> recordDuplicateTiles(int** puzzle);
 
+unordered_map <string, int> buildMapOfTiles(int** puzzle, const int start_index, const int end_index);
+
+unordered_map <string, string> buildMapOfTiles(int** puzzle);
 /**
  * @brief Swaps two random tiles in a 2D array.
  *
@@ -307,6 +310,8 @@ void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE,
 int calculateDiversity(int*** population_arr, const int POPULATION_SIZE);
 
 void copyPuzzle(int** source_puzzle, int** copy_puzzle);
+
+void copyTile(int* source_tile, int* dest_tile);
 
 void writePuzzleIntoPopulation(int***, const int POPULATION_SIZE, int**);
 

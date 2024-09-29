@@ -73,6 +73,7 @@ string convertTileToString(vector<int> vec){
     return result;
 }
 
+
 /**
  * @brief Records duplicate tiles in a puzzle.
  *
@@ -112,17 +113,87 @@ unordered_map<string, int> recordDuplicateTiles(int** puzzle){
     }
 
     // removing elements from map that are not duplicates
-    for (auto it = duplicatesMap.begin(); it != duplicatesMap.end();){
-        if (it->second == 1){
-            it = duplicatesMap.erase(it);
-        }
-        else{
-            it++;
-        }
-    }
+    // for (auto it = duplicatesMap.begin(); it != duplicatesMap.end();){
+    //     if (it->second == 1){
+    //         it = duplicatesMap.erase(it);
+    //     }
+    //     else{
+    //         it++;
+    //     }
+    // }
 
     return duplicatesMap; 
 }
+
+unordered_map <string, string> buildMapOfTiles(int** puzzle){
+    unordered_map <string, string> map_of_tiles;
+    
+    for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
+        vector<int> tile = convertTileToVector(puzzle[i]);
+        
+        string id_tile = convertTileToString(tile);
+        if (map_of_tiles.find(id_tile) == map_of_tiles.end()){
+            map_of_tiles[id_tile] = id_tile;
+
+            for (int j = 1; j < TILE_SIZE; j++){
+                map_of_tiles[convertTileToString(rotateToLeftByOneIndexReturn(tile))] = id_tile;
+            }
+        }   
+    }
+
+    return map_of_tiles;
+}
+
+
+unordered_map <string, int> buildMapOfTiles(int** puzzle, const int start_index, const int end_index){
+    unordered_map <string, int> map_of_tiles;
+
+    for (int i = start_index; i < end_index; i++){
+        vector<int> tile = convertTileToVector(puzzle[i]);
+        vector<string> tile_rotations_vec(TILE_SIZE);
+        
+        tile_rotations_vec[0] = convertTileToString(tile);
+
+        for (int j = 1; j < TILE_SIZE; j++){
+            tile_rotations_vec[j] = convertTileToString(rotateToLeftByOneIndexReturn(tile));
+        }
+
+        string hit_key = "";
+        for (int j = 0; j < tile_rotations_vec.size(); j++){
+            if (map_of_tiles.find(tile_rotations_vec[j]) != map_of_tiles.end()){
+                hit_key = tile_rotations_vec[j];
+            }
+        }
+
+        if (hit_key == ""){
+            map_of_tiles[tile_rotations_vec[0]] = 1;
+        }
+        else{
+            map_of_tiles[hit_key] = map_of_tiles[hit_key] + 1;
+        }
+    }
+
+    return map_of_tiles;
+}
+
+pair<bool, string> isTileInMap(unordered_map<string, int> map_to_search, vector<int> tile){
+    vector<string> tile_rotations_vec(TILE_SIZE);
+
+    tile_rotations_vec[0] = convertTileToString(tile);
+
+    for (int j = 1; j < TILE_SIZE; j++){
+        tile_rotations_vec[j] = convertTileToString(rotateToLeftByOneIndexReturn(tile));
+    }
+
+    int tile_rotations_vec_size = tile_rotations_vec.size();
+    for (int i = 0; i < tile_rotations_vec_size; i++){
+        if (map_to_search.find(tile_rotations_vec[i]) != map_to_search.end()){
+            return make_pair(true, tile_rotations_vec[i]);
+        }
+    }
+    return make_pair(false, "");
+}
+
 
 
 /**
@@ -442,6 +513,109 @@ pair<int, int>  twoPointCrossover(int** offspring1, int** offspring2){
     return make_pair(crossover_point1, crossover_point2);
 }
 
+void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, int> duplicatesMap){
+
+    int** parent1 = allocatePuzzle();
+    int** parent2 = allocatePuzzle();
+    copyPuzzle(offspring1, parent1);
+    copyPuzzle(offspring2, parent2);
+
+    unordered_map<string, int> trackedDuplicates1 = duplicatesMap;
+    for (auto it = trackedDuplicates1.begin(); it != trackedDuplicates1.end(); it++){
+        it->second = 0;
+    }
+    unordered_map<string, int> trackedDuplicates2 = trackedDuplicates1;
+
+    // using a high-resolution clock to seed the random number generator
+    unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed); // Mersenne Twister random number generator
+    std::uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
+
+    // Generate the crossover points
+    int crossover_point1 = distribution(generator);
+    int crossover_point2 = distribution(generator);
+
+    // Ensure CrossoverPoint1 < CrossoverPoint2
+    if (crossover_point1 > crossover_point2){
+        int temp = crossover_point1;
+        crossover_point1 = crossover_point2;
+        crossover_point2 = temp;
+    }
+
+    //unordered_map<string, int> tiles_from_parent1 = buildMapOfTiles(parent1, crossover_point1, crossover_point2);
+    //unordered_map<string, int> tiles_from_parent2 = buildMapOfTiles(parent2, crossover_point1, crossover_point2);
+
+    
+    // Perform two-point crossover
+    for (int i = crossover_point1; i < crossover_point2; i++){
+        copyTile(parent1[i], offspring2[i]);
+        copyTile(parent2[i], offspring1[i]);
+    }
+
+    // updating trackedDuplicates maps based on what's in between crossover points.
+    for (int i = crossover_point1; i < crossover_point2; i++){
+        vector<int> parent1_tile = convertTileToVector(parent1[i]);
+        vector<int> parent2_tile = convertTileToVector(parent2[i]);
+
+        pair<bool, string> tile1_found = isTileInMap(trackedDuplicates1, parent1_tile);
+        if (tile1_found.first){
+            trackedDuplicates1[tile1_found.second]++;
+        }
+
+        pair<bool, string> tile2_found = isTileInMap(trackedDuplicates2, parent2_tile);
+        if (tile2_found.first){
+            trackedDuplicates2[tile2_found.second]++;
+        }
+    }
+
+    //copy what is not between crossover points from parent2 to offspring2
+    int count_limit = TILES_IN_PUZZLE_COUNT - (crossover_point2 - crossover_point1);
+    for (int i = crossover_point2, j = i, count = 0; count < count_limit; i = (i + 1) % TILES_IN_PUZZLE_COUNT){
+        pair<bool, string> tile_found = isTileInMap(trackedDuplicates1, convertTileToVector(parent2[i]));
+
+        if ((trackedDuplicates1[tile_found.second] < duplicatesMap[tile_found.second])){
+            copyTile(parent2[i], offspring2[j]);
+            trackedDuplicates1[tile_found.second]++;
+            j = (j + 1) % TILES_IN_PUZZLE_COUNT;
+            count++;
+        }
+
+        // if (tile_found.first && (duplicatesMap.find(tile_found.second) != duplicatesMap.end()) && (trackedDuplicates1[tile_found.second] < duplicatesMap[tile_found.second])){
+        //     copyTile(parent2[i], offspring2[j]);
+        //     trackedDuplicates1[tile_found.second]++;
+        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
+        // }
+        // else if (!tile_found.first){
+        //     copyTile(parent2[i], offspring2[j]);
+        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
+        // }
+    }
+
+    //copy what is not between crossover points from parent1 to offspring1
+    for (int i = crossover_point2, j = i, count = 0; count < count_limit; i = (i + 1) % TILES_IN_PUZZLE_COUNT){
+        pair<bool, string> tile_found = isTileInMap(trackedDuplicates2, convertTileToVector(parent1[i]));
+
+        if ((trackedDuplicates2[tile_found.second] < duplicatesMap[tile_found.second])){
+            copyTile(parent1[i], offspring1[j]);
+            trackedDuplicates2[tile_found.second]++;
+            j = (j + 1) % TILES_IN_PUZZLE_COUNT;
+            count++;
+        }
+
+        // if (tile_found.first && (duplicatesMap.find(tile_found.second) != duplicatesMap.end()) && (trackedDuplicates2[tile_found.second] < duplicatesMap[tile_found.second])){
+        //     copyTile(parent1[i], offspring1[j]);
+        //     trackedDuplicates2[tile_found.second]++;
+        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
+        // }
+        // else if (!tile_found.first){
+        //     copyTile(parent1[i], offspring1[j]);
+        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
+        // }
+    }
+    freePuzzle(parent1);
+    freePuzzle(parent2);
+
+}
 
 /**
  * @brief Evolves a population of solutions over a specified number of generations.
@@ -555,7 +729,7 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> par
             copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
             copyPuzzle(population_arr[parent_index_vec[i + 1]], offspring2);
 
-            twoPointCrossover(offspring1, offspring2);
+            orderCrossover(offspring1, offspring2, duplicatesMap);
 
             copyPuzzle(offspring1, offspring_arr[i]);
             copyPuzzle(offspring2, offspring_arr[i + 1]);
@@ -628,11 +802,17 @@ int calculateDiversity(int*** population_arr, const int POPULATION_SIZE) {
     return 0;
 }
 
-void copyPuzzle(int** source_puzzle, int** copy_puzzle){
+void copyPuzzle(int** source_puzzle, int** dest_puzzle){
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++){
         for (int j = 0; j < TILE_SIZE; j++){
-            copy_puzzle[i][j] = source_puzzle[i][j];
+            dest_puzzle[i][j] = source_puzzle[i][j];
         }
+    }
+}
+
+void copyTile(int* source_tile, int* dest_tile){
+    for (int i = 0; i < TILE_SIZE; i++){
+        dest_tile[i] = source_tile[i];
     }
 }
 
