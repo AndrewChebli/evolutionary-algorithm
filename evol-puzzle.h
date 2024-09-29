@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <utility>
 #include <cmath>
+#include <sys/stat.h>
+#include <sys/types.h>
 using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64
@@ -320,4 +322,4 @@ void writePuzzleIntoPopulation(int***, const int POPULATION_SIZE, int**);
 
 void printPuzzle(int** puzzle);
 
-void savePuzzle(int** puzzle);
+void savePuzzle(int** puzzle, int edge_mismatch_count);

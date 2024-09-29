@@ -646,7 +646,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         if (sorted_index_by_fitness_vec.back().second < min_edge_mismatch_count){
             best_puzzle_so_far = population_arr[sorted_index_by_fitness_vec.back().first];
             printPuzzle(best_puzzle_so_far);
-            savePuzzle(best_puzzle_so_far);
+            savePuzzle(best_puzzle_so_far, sorted_index_by_fitness_vec.back().second);
         }
 
         min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
@@ -839,10 +839,27 @@ void printPuzzle(int** puzzle){
     cout << "\n\n";
 }
 
-void savePuzzle(int** puzzle) {
-    ofstream file("Ass1Output.txt");
+void savePuzzle(int** puzzle, int edge_mismatch_count) {
+    int status = mkdir("output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (status != 0 && errno != EEXIST) {
+        cerr << "Unable to create directory 'output'";
+        return;
+    }
+    // get current time and date
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::tm* now_tm = std::localtime(&now_time);
+
+    // format the time and date
+    char time_buffer[100];
+    std::strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d-%H-%M-%S", now_tm);
+
+    std::ostringstream filename;
+    filename << "output/Ass1Output-" << edge_mismatch_count << "-" << time_buffer << ".txt";
+
+    ofstream file(filename.str());
     if (!file) {
-        cerr << "Unable to open file Ass1Output.txt for writing";
+        cerr << "Unable to open file " << filename.str() << " for writing";
         return;
     }
 
