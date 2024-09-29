@@ -51,6 +51,8 @@ constexpr int TILE_SIZE = 4;
  */
 constexpr int TILES_IN_PUZZLE_COUNT = 64;
 
+pair<mt19937, uniform_int_distribution<int>> getRandomGen();
+
 /**
  * @brief Rotates the elements of the given array to the left by one index.
  * 
@@ -203,7 +205,7 @@ void freePopulation(int*** population_arr, int population_size);
  *            represents the size of each tile.
  * @param population_size The number of individuals in the population.
  */
-void generatePopulation(int*** population_arr, int** puzzle, int population_size);
+void generatePopulation(int*** population_arr, int** puzzle, int population_size, pair<mt19937, uniform_int_distribution<int>> random);
 
 /**
  * @brief Counts the number of edge mismatches in a given puzzle.
@@ -256,7 +258,7 @@ pair<int, int>  twoPointCrossover(int** parent1, int** parent2);
  * @param NUM_OF_GENERATIONS The number of generations to evolve the population.
  * @param POPULATION_SIZE The size of the population.
  */
-void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, unordered_map<string, int> duplicatesMap);
+void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles,pair<mt19937, uniform_int_distribution<int>> random);
 
 /**
  * @brief Mutates a population of puzzles by performing random rotations and swaps.
@@ -274,7 +276,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  * - Rotates a randomly selected tile to the left by one index.
  * - Swaps tiles within the puzzle.
  */
-void mutate(int*** offspring_arr, const int POPULATION_SIZE);
+void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random);
 
 /**
  * @brief Performs crossover operation on a population array.
@@ -287,7 +289,7 @@ void mutate(int*** offspring_arr, const int POPULATION_SIZE);
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> parent_indexes_vec, int*** offspring_arr, unordered_map<string, int> duplicatesMap);
+void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<int> &parent_indexes_vec, int*** offspring_arr, const unordered_map<string, int> &duplicatesMap, const unordered_map<string,string> &map_of_tiles, pair<mt19937, uniform_int_distribution<int>> random);
 
 /**
  * @brief Evaluates the fitness of a population of puzzle solutions.
@@ -303,9 +305,9 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> par
  */
 vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE);
 
-pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec, const float ratio);
+pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const float ratio);
 
-void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, vector<int> worst_index_vec, int*** offspring_arr);
+void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, const vector<int> &worst_index_vec, int*** offspring_arr);
 
 int calculateDiversity(int*** population_arr, const int POPULATION_SIZE);
 

@@ -1,6 +1,16 @@
 #include "evol-puzzle.h"
 
 
+pair<mt19937, uniform_int_distribution<int>> getRandomGen(){
+    // using a high-resolution clock to seed the random number generator
+    unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed); // Mersenne Twister random number generator
+    std::uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
+
+    return make_pair(generator, distribution);
+}
+
+
 /**
  * @brief Rotates the elements of the given array to the left by one index.
  * 
@@ -69,6 +79,14 @@ string convertTileToString(vector<int> vec){
     string result;
     for (int i = 0; i < TILE_SIZE; i++){
         result += to_string(vec[i]);
+    }
+    return result;
+}
+
+string convertTileToString(int arr[]){
+    string result;
+    for (int i = 0; i < TILE_SIZE; i++){
+        result += to_string(arr[i]);
     }
     return result;
 }
@@ -176,7 +194,7 @@ unordered_map <string, int> buildMapOfTiles(int** puzzle, const int start_index,
     return map_of_tiles;
 }
 
-pair<bool, string> isTileInMap(unordered_map<string, int> map_to_search, vector<int> tile){
+pair<bool, string> isTileInMap(const unordered_map<string, int> &map_to_search, vector<int> tile){
     vector<string> tile_rotations_vec(TILE_SIZE);
 
     tile_rotations_vec[0] = convertTileToString(tile);
@@ -194,6 +212,19 @@ pair<bool, string> isTileInMap(unordered_map<string, int> map_to_search, vector<
     return make_pair(false, "");
 }
 
+pair<bool, string> isTileInMap(const unordered_map<string, int> &map_to_search, string tile){
+    if (map_to_search.find(tile) != map_to_search.end()){
+        return make_pair(true, tile);
+    }
+    return make_pair(false, "");
+}
+
+pair<bool, string> isTileInMap(const unordered_map<string, string> &map_to_search, string tile){
+    if (map_to_search.find(tile) != map_to_search.end()){
+        return make_pair(true, map_to_search.at(tile));
+    }
+    return make_pair(false, "");
+}
 
 
 /**
@@ -207,16 +238,13 @@ pair<bool, string> isTileInMap(unordered_map<string, int> map_to_search, vector<
  *
  * @note The array is assumed to have a size of TILES_IN_PUZZLE_COUNT x TILE_SIZE.
  */
-void swapTile(int** arr){
+void swapTile(int** arr, pair<mt19937, uniform_int_distribution<int>> random){
     // using a high-resolution clock to seed the random number generator
-    unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::mt19937 generator(seed); // Mersenne Twister random number generator
-    std::uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
 
-    int first_index = distribution(generator);
+    int first_index = random.second(random.first);
     int second_index = first_index;
     while (second_index == first_index){
-        second_index = distribution(generator);
+        second_index = random.second(random.first);
     }
 
     int temp_tile[TILE_SIZE];
@@ -370,7 +398,7 @@ void freePopulation(int*** population_arr, int population_size) {
  *            represents the size of each tile.
  * @param population_size The number of individuals in the population.
  */
-void generatePopulation(int*** population_arr, int** arr, int population_size){
+void generatePopulation(int*** population_arr, int** arr, int population_size, pair<mt19937, uniform_int_distribution<int>> random){
 
         int** arr_copy = allocatePuzzle();
 
@@ -389,7 +417,7 @@ void generatePopulation(int*** population_arr, int** arr, int population_size){
         #pragma omp parallel for
         for (int i = 1; i < population_size; i++){
             for (int j = 0; j < TILES_IN_PUZZLE_COUNT/2; j++){
-                swapTile(arr_copy);
+                swapTile(arr_copy, random);
             }
             
             for (int j = 0; j < TILES_IN_PUZZLE_COUNT; j++){
@@ -513,7 +541,7 @@ pair<int, int>  twoPointCrossover(int** offspring1, int** offspring2){
     return make_pair(crossover_point1, crossover_point2);
 }
 
-void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, int> duplicatesMap){
+void orderCrossover(int** offspring1, int** offspring2, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles, pair<mt19937, uniform_int_distribution<int>> random){
 
     int** parent1 = allocatePuzzle();
     int** parent2 = allocatePuzzle();
@@ -526,14 +554,9 @@ void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, in
     }
     unordered_map<string, int> trackedDuplicates2 = trackedDuplicates1;
 
-    // using a high-resolution clock to seed the random number generator
-    unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::mt19937 generator(seed); // Mersenne Twister random number generator
-    std::uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
-
     // Generate the crossover points
-    int crossover_point1 = distribution(generator);
-    int crossover_point2 = distribution(generator);
+    int crossover_point1 = random.second(random.first);
+    int crossover_point2 = random.second(random.first);
 
     // Ensure CrossoverPoint1 < CrossoverPoint2
     if (crossover_point1 > crossover_point2){
@@ -541,10 +564,6 @@ void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, in
         crossover_point1 = crossover_point2;
         crossover_point2 = temp;
     }
-
-    //unordered_map<string, int> tiles_from_parent1 = buildMapOfTiles(parent1, crossover_point1, crossover_point2);
-    //unordered_map<string, int> tiles_from_parent2 = buildMapOfTiles(parent2, crossover_point1, crossover_point2);
-
     
     // Perform two-point crossover
     for (int i = crossover_point1; i < crossover_point2; i++){
@@ -554,15 +573,15 @@ void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, in
 
     // updating trackedDuplicates maps based on what's in between crossover points.
     for (int i = crossover_point1; i < crossover_point2; i++){
-        vector<int> parent1_tile = convertTileToVector(parent1[i]);
-        vector<int> parent2_tile = convertTileToVector(parent2[i]);
+        string parent1_tile = convertTileToString(parent1[i]);
+        string parent2_tile = convertTileToString(parent2[i]);
 
-        pair<bool, string> tile1_found = isTileInMap(trackedDuplicates1, parent1_tile);
+        pair<bool, string> tile1_found = isTileInMap(map_of_tiles, parent1_tile);
         if (tile1_found.first){
             trackedDuplicates1[tile1_found.second]++;
         }
 
-        pair<bool, string> tile2_found = isTileInMap(trackedDuplicates2, parent2_tile);
+        pair<bool, string> tile2_found = isTileInMap(map_of_tiles, parent2_tile);
         if (tile2_found.first){
             trackedDuplicates2[tile2_found.second]++;
         }
@@ -571,46 +590,28 @@ void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, in
     //copy what is not between crossover points from parent2 to offspring2
     int count_limit = TILES_IN_PUZZLE_COUNT - (crossover_point2 - crossover_point1);
     for (int i = crossover_point2, j = i, count = 0; count < count_limit; i = (i + 1) % TILES_IN_PUZZLE_COUNT){
-        pair<bool, string> tile_found = isTileInMap(trackedDuplicates1, convertTileToVector(parent2[i]));
+        pair<bool, string> tile_found = isTileInMap(trackedDuplicates2, map_of_tiles.at(convertTileToString(parent2[i])));
 
-        if ((trackedDuplicates1[tile_found.second] < duplicatesMap[tile_found.second])){
+        if ((trackedDuplicates1[tile_found.second] < duplicatesMap.at(tile_found.second))){
             copyTile(parent2[i], offspring2[j]);
             trackedDuplicates1[tile_found.second]++;
             j = (j + 1) % TILES_IN_PUZZLE_COUNT;
             count++;
         }
 
-        // if (tile_found.first && (duplicatesMap.find(tile_found.second) != duplicatesMap.end()) && (trackedDuplicates1[tile_found.second] < duplicatesMap[tile_found.second])){
-        //     copyTile(parent2[i], offspring2[j]);
-        //     trackedDuplicates1[tile_found.second]++;
-        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
-        // }
-        // else if (!tile_found.first){
-        //     copyTile(parent2[i], offspring2[j]);
-        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
-        // }
     }
 
     //copy what is not between crossover points from parent1 to offspring1
     for (int i = crossover_point2, j = i, count = 0; count < count_limit; i = (i + 1) % TILES_IN_PUZZLE_COUNT){
-        pair<bool, string> tile_found = isTileInMap(trackedDuplicates2, convertTileToVector(parent1[i]));
+        pair<bool, string> tile_found = isTileInMap(trackedDuplicates2, map_of_tiles.at(convertTileToString(parent1[i])));
 
-        if ((trackedDuplicates2[tile_found.second] < duplicatesMap[tile_found.second])){
+        if ((trackedDuplicates2[tile_found.second] < duplicatesMap.at(tile_found.second))){
             copyTile(parent1[i], offspring1[j]);
             trackedDuplicates2[tile_found.second]++;
             j = (j + 1) % TILES_IN_PUZZLE_COUNT;
             count++;
         }
 
-        // if (tile_found.first && (duplicatesMap.find(tile_found.second) != duplicatesMap.end()) && (trackedDuplicates2[tile_found.second] < duplicatesMap[tile_found.second])){
-        //     copyTile(parent1[i], offspring1[j]);
-        //     trackedDuplicates2[tile_found.second]++;
-        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
-        // }
-        // else if (!tile_found.first){
-        //     copyTile(parent1[i], offspring1[j]);
-        //     j = (j + 1) % TILES_IN_PUZZLE_COUNT;
-        // }
     }
     freePuzzle(parent1);
     freePuzzle(parent2);
@@ -628,7 +629,7 @@ void orderCrossover(int** offspring1, int** offspring2, unordered_map<string, in
  * @param NUM_OF_GENERATIONS The number of generations to evolve the population.
  * @param POPULATION_SIZE The size of the population.
  */
-void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, unordered_map<string, int> duplicatesMap){
+void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles,pair<mt19937, uniform_int_distribution<int>> random){
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
     float ratio = 0.5;
@@ -636,7 +637,9 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
     while (min_edge_mismatch_count != 0){
     //while (generations_performed <= NUM_OF_GENERATIONS){
-
+        //refreshing random gen
+        random = getRandomGen();
+        
         // Step 2: Evaluate Fitness
         vector<pair<int, int>> sorted_index_by_fitness_vec = evaluateFitness(population_arr, POPULATION_SIZE); //<index, edgeMismatchCount>
 
@@ -659,8 +662,8 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         vector<int> worst_index_vec = parents_and_worst_indexes_pair.second;
 
         // Step 5: Offspring generation
-        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap);
-        mutate(offspring_arr, POPULATION_SIZE * ratio);
+        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap, map_of_tiles, random);
+        mutate(offspring_arr, POPULATION_SIZE * ratio, random);
 
         // Step 6: Survivor Selection
         selectSurvivorsAndReplace(population_arr, POPULATION_SIZE, worst_index_vec, offspring_arr);
@@ -690,19 +693,16 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  * - Rotates a randomly selected tile to the left by one index.
  * - Swaps tiles within the puzzle.
  */
-void mutate(int*** offspring_arr, const int POPULATION_SIZE){
+void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random){
     for (int i = 0; i < POPULATION_SIZE; i++){
-        unsigned seed = chrono::high_resolution_clock::now().time_since_epoch().count();
-        mt19937 generator(seed); // Mersenne Twister random number generator
-        uniform_int_distribution<int> distribution(0, TILES_IN_PUZZLE_COUNT - 1);
 
-        int num_iterations = distribution(generator);
+        int num_iterations = random.second(random.first);
         for (int j = 0; j < num_iterations; j++){
-            rotateToLeftByOneIndex(offspring_arr[i][distribution(generator)]);
+            rotateToLeftByOneIndex(offspring_arr[i][random.second(random.first)]);
         }
 
         for (int j = 0; j < num_iterations; j++){
-            swapTile(offspring_arr[i]);
+            swapTile(offspring_arr[i], random);
         }
     }
 }
@@ -718,7 +718,7 @@ void mutate(int*** offspring_arr, const int POPULATION_SIZE){
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> parent_index_vec, int*** offspring_arr, unordered_map<string, int> duplicatesMap){
+void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<int> &parent_index_vec, int*** offspring_arr, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles, pair<mt19937, uniform_int_distribution<int>> random){
     int parent_index_vec_size = parent_index_vec.size();
 
     int** offspring1 = allocatePuzzle();
@@ -729,7 +729,7 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, vector<int> par
             copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
             copyPuzzle(population_arr[parent_index_vec[i + 1]], offspring2);
 
-            orderCrossover(offspring1, offspring2, duplicatesMap);
+            orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
 
             copyPuzzle(offspring1, offspring_arr[i]);
             copyPuzzle(offspring2, offspring_arr[i + 1]);
@@ -770,7 +770,7 @@ vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATI
     return sorted_index_by_fitness_vec;
 }
 
-pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, vector<pair<int, int>> sorted_index_by_fitness_vec, const float ratio){
+pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const float ratio){
     
     // ratio is percentage of top ranking puzzles to select as parents
     int starting_point_parents = POPULATION_SIZE - POPULATION_SIZE * ratio;
@@ -789,7 +789,7 @@ pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, cons
     return make_pair(parents_index_vec, worst_index_vec);
 }
 
-void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, vector<int> worst_index_vec, int*** offspring_arr){
+void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, const vector<int> &worst_index_vec, int*** offspring_arr){
     int size = worst_index_vec.size();
     for (int i = 0; i < size; i++){
         copyPuzzle(offspring_arr[i], population_arr[worst_index_vec[i]]);

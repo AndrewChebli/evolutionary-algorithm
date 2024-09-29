@@ -4,6 +4,8 @@
 int main(){
     auto start = chrono::high_resolution_clock::now();
 
+    pair<mt19937, uniform_int_distribution<int>> random = getRandomGen();
+    
     int** puzzle = allocatePuzzle();
     readInput("Ass1Input.txt", puzzle);
     int POPULATION_SIZE = 1000;
@@ -13,10 +15,10 @@ int main(){
     int*** population_arr = allocatePopulation(POPULATION_SIZE);
 
     // Step 1: Initialization
-    generatePopulation(population_arr, puzzle, POPULATION_SIZE);
+    generatePopulation(population_arr, puzzle, POPULATION_SIZE, random);
 
     // Step 2-6 
-    evolve(population_arr, NUM_OF_GENERATIONS, POPULATION_SIZE, duplicatesMap);
+    evolve(population_arr, NUM_OF_GENERATIONS, POPULATION_SIZE, duplicatesMap, map_of_tiles, random);
 
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
