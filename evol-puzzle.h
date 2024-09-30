@@ -292,7 +292,7 @@ void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, unifo
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<int> &parent_indexes_vec, int*** offspring_arr, const unordered_map<string, int> &duplicatesMap, const unordered_map<string,string> &map_of_tiles, pair<mt19937, uniform_int_distribution<int>> random);
+void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<int> &parent_indexes_vec, int*** offspring_arr, const unordered_map<string, int> &duplicatesMap, const unordered_map<string,string> &map_of_tiles, int min_edge_mismatch_count, pair<mt19937, uniform_int_distribution<int>> random);
 
 /**
  * @brief Evaluates the fitness of a population of puzzle solutions.

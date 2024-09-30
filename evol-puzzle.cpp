@@ -675,7 +675,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         vector<int> worst_index_vec = parents_and_worst_indexes_pair.second;
 
         // Step 5: Offspring generation
-        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap, map_of_tiles, random);
+        crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap, map_of_tiles, sorted_index_by_fitness_vec.back().second, random);
         mutate(offspring_arr, POPULATION_SIZE * ratio, random);
 
         // Step 6: Survivor Selection
@@ -708,7 +708,10 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  */
 void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random){
     for (int i = 0; i < POPULATION_SIZE; i++){
-
+        // if (random.second(random.first) % 8 <= 2){
+        //     continue;
+        // }
+        // int num_iterations = random.second(random.first) % 32;
         int num_iterations = random.second(random.first);
         for (int j = 0; j < num_iterations; j++){
             rotateToLeftByOneIndex(offspring_arr[i][random.second(random.first)]);
@@ -731,7 +734,7 @@ void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, unifo
  *                       is represented as a pointer to an array of integers.
  * @param POPULATION_SIZE The size of the population array.
  */
-void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<int> &parent_index_vec, int*** offspring_arr, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles, pair<mt19937, uniform_int_distribution<int>> random){
+void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<int> &parent_index_vec, int*** offspring_arr, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles, int min_edge_mismatch_count, pair<mt19937, uniform_int_distribution<int>> random){
     int parent_index_vec_size = parent_index_vec.size();
 
     int** offspring1 = allocatePuzzle();
@@ -742,7 +745,9 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
             copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
             copyPuzzle(population_arr[parent_index_vec[i + 1]], offspring2);
 
-            orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
+            if (min_edge_mismatch_count <= 30){
+                orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
+            }
 
             copyPuzzle(offspring1, offspring_arr[i]);
             copyPuzzle(offspring2, offspring_arr[i + 1]);
