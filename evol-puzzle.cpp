@@ -685,7 +685,8 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
         generations_performed++;
     }
-
+    cout << "\n\nBest Puzzle with " << min_edge_mismatch_count << " edge mismatches:\n";
+    printPuzzle(best_puzzle_so_far);
     freePuzzle(best_puzzle_so_far);
     freePopulation(offspring_arr, POPULATION_SIZE * ratio);
 }
