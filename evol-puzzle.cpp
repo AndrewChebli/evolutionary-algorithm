@@ -634,11 +634,11 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int generations_performed = 1;
     int stagnated_generation_count = 0;
     const int stagnation_threshold = 1000;
-    float ratio = 0.5;
+    float ratio = 0.25;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
-    while (min_edge_mismatch_count != 0){
-    //while (generations_performed <= NUM_OF_GENERATIONS){
+    // while (min_edge_mismatch_count != 0){
+    while (generations_performed <= NUM_OF_GENERATIONS){
         //refreshing random gen
         random = getRandomGen();
         
@@ -712,14 +712,15 @@ void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, unifo
         // if (random.second(random.first) % 8 <= 2){
         //     continue;
         // }
-        // int num_iterations = random.second(random.first) % 32;
-        int num_iterations = random.second(random.first);
+        //int num_iterations = random.second(random.first) % 32;
+        int num_iterations = random.second(random.first) % 32;
         for (int j = 0; j < num_iterations; j++){
-            rotateToLeftByOneIndex(offspring_arr[i][random.second(random.first)]);
-        }
+            if(j % 2 == 0) {
+                swapTile(offspring_arr[i], random);
+            } else {
+                rotateToLeftByOneIndex(offspring_arr[i][random.second(random.first)]);
+            }
 
-        for (int j = 0; j < num_iterations; j++){
-            swapTile(offspring_arr[i], random);
         }
     }
 }
