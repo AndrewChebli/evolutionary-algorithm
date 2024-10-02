@@ -418,6 +418,7 @@ void generatePopulation(int*** population_arr, int** arr, int population_size, p
         for (int i = 1; i < population_size; i++){
             for (int j = 0; j < TILES_IN_PUZZLE_COUNT/2; j++){
                 swapTile(arr_copy, random);
+                rotateToLeftByOneIndex(arr_copy[j]);
             }
             
             for (int j = 0; j < TILES_IN_PUZZLE_COUNT; j++){
@@ -747,9 +748,9 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
             copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
             copyPuzzle(population_arr[parent_index_vec[i + 1]], offspring2);
 
-            if (min_edge_mismatch_count <= 30){
-                orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
-            }
+            // if (min_edge_mismatch_count <= 30){
+            //     orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
+            // }
 
             copyPuzzle(offspring1, offspring_arr[i]);
             copyPuzzle(offspring2, offspring_arr[i + 1]);
