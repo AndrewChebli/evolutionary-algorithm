@@ -300,10 +300,10 @@ void readInput(string filename, int** puzzle){
     while (stream >> number) {  // Reading each number as a string
         vector<int> tile;  
         for (char digit : number) {  // Iterating through each character
-            tile.push_back(digit - '0');  // Converting char to int and adding to row
+            tile.emplace_back(digit - '0');  // Converting char to int and adding to row
         }
         // Adding the row of digits to the 2D array
-        digitsArray.push_back(tile);
+        digitsArray.emplace_back(tile);
     }
 
     // copying from vector<vector<int>> to normal 2d int array
@@ -780,10 +780,10 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
  */
 vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE){
 
-    vector<pair<int, int>> sorted_index_by_fitness_vec;
+    vector<pair<int, int>> sorted_index_by_fitness_vec(POPULATION_SIZE);
 
     for (int i = 0; i < POPULATION_SIZE; i++){
-        sorted_index_by_fitness_vec.push_back(make_pair(i, countEdgeMismatch(population_arr[i])));
+        sorted_index_by_fitness_vec[i] = (make_pair(i, countEdgeMismatch(population_arr[i])));
     }
 
     sort(sorted_index_by_fitness_vec.begin(), sorted_index_by_fitness_vec.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
@@ -799,14 +799,14 @@ pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, cons
     int starting_point_parents = POPULATION_SIZE - ratio_adjusted_pop_size;
     int threshold_worst = ratio_adjusted_pop_size;
 
-    vector<int> parents_index_vec;
+    vector<int> parents_index_vec(ratio_adjusted_pop_size);
     for (int i = starting_point_parents; i < POPULATION_SIZE; i++){
-        parents_index_vec.push_back(sorted_index_by_fitness_vec[i].first);
+        parents_index_vec[i] = sorted_index_by_fitness_vec[i].first;
     }
 
-    vector<int> worst_index_vec;
+    vector<int> worst_index_vec(ratio_adjusted_pop_size);
     for (int i = 0; i < threshold_worst; i++){
-        worst_index_vec.push_back(sorted_index_by_fitness_vec[i].first);
+        worst_index_vec[i] = (sorted_index_by_fitness_vec[i].first);
     }
 
     return make_pair(parents_index_vec, worst_index_vec);
