@@ -2,14 +2,18 @@
 #include "evol-puzzle.h"
 
 int main(){
+    int POPULATION_SIZE;
+    int NUM_OF_GENERATIONS;
+    cout << "Select population size: ";
+    cin >> POPULATION_SIZE;
+    cout << "Select number of generations: ";
+    cin >> NUM_OF_GENERATIONS;
     auto start = chrono::high_resolution_clock::now();
 
     pair<mt19937, uniform_int_distribution<int>> random = getRandomGen();
     
     int** puzzle = allocatePuzzle();
     readInput("Ass1Input.txt", puzzle);
-    int POPULATION_SIZE = 1000;
-    int NUM_OF_GENERATIONS = 100000;
     unordered_map<string, string> map_of_tiles = buildMapOfTiles(puzzle);
     unordered_map<string, int> duplicatesMap = recordDuplicateTiles(puzzle);
     int*** population_arr = allocatePopulation(POPULATION_SIZE);

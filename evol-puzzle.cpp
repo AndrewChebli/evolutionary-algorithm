@@ -326,11 +326,11 @@ void readInput(string filename, int** puzzle){
  * @return A pointer to the allocated 3D array representing the population.
  */
 int*** allocatePopulation(int population_size) {
-    int*** population = new int**[population_size];
+    int*** __restrict population = new int**[population_size];
     for (int i = 0; i < population_size; ++i) {
-        population[i] = new int*[TILES_IN_PUZZLE_COUNT];
+        population[i] __restrict = new int*[TILES_IN_PUZZLE_COUNT];
         for (int j = 0; j < TILES_IN_PUZZLE_COUNT; ++j) {
-            population[i][j] = new int[TILE_SIZE];
+            population[i][j] __restrict = new int[TILE_SIZE];
         }
     }
     return population;
@@ -349,9 +349,9 @@ int*** allocatePopulation(int population_size) {
  * @return int** A pointer to the allocated 2D array representing the puzzle.
  */
 int** allocatePuzzle() {
-    int** puzzle = new int*[TILES_IN_PUZZLE_COUNT];
+    int** __restrict puzzle = new int*[TILES_IN_PUZZLE_COUNT];
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; ++i) {
-        puzzle[i] = new int[TILE_SIZE];
+        puzzle[i] __restrict = new int[TILE_SIZE];
     }
     return puzzle;
 }
@@ -638,7 +638,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     float ratio = 0.25;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
-    // while (min_edge_mismatch_count != 0){
+    //while (min_edge_mismatch_count != 0){
     while (generations_performed <= NUM_OF_GENERATIONS){
         //refreshing random gen
         random = getRandomGen();
