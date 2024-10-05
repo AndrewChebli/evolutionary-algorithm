@@ -630,7 +630,7 @@ void orderCrossover(int** offspring1, int** offspring2, const unordered_map<stri
  * @param NUM_OF_GENERATIONS The number of generations to evolve the population.
  * @param POPULATION_SIZE The size of the population.
  */
-void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles,pair<mt19937, uniform_int_distribution<int>> random){
+void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_SIZE, const unordered_map<string, int> &duplicatesMap, const unordered_map<string, string> &map_of_tiles,pair<mt19937, uniform_int_distribution<int>> random, bool print_flag){
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
     int stagnated_generation_count = 0;
@@ -650,7 +650,11 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
 
         if (sorted_index_by_fitness_vec.back().second < min_edge_mismatch_count){
             best_puzzle_so_far = population_arr[sorted_index_by_fitness_vec.back().first];
-            printPuzzle(best_puzzle_so_far);
+            
+            if (print_flag){
+                printPuzzle(best_puzzle_so_far);
+            }
+
             if (sorted_index_by_fitness_vec.back().second <= 25){
                 savePuzzle(best_puzzle_so_far, sorted_index_by_fitness_vec.back().second);
             }
@@ -684,8 +688,11 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         // Step 6: Survivor Selection
         selectSurvivorsAndReplace(population_arr, POPULATION_SIZE, worst_index_vec, offspring_arr);
 
-        cout << "GEN " << generations_performed << " " << " edge mismatch: "  << sorted_index_by_fitness_vec.back().second \
-        << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
+        if (print_flag){
+            cout << "GEN " << generations_performed << " " << " edge mismatch: "  << sorted_index_by_fitness_vec.back().second \
+            << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
+        }
+        
         generations_performed++;
     }
     cout << "\n\nBest Puzzle with " << min_edge_mismatch_count << " edge mismatches:\n";

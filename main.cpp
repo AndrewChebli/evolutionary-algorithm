@@ -1,7 +1,14 @@
 #include <iostream>
 #include "evol-puzzle.h"
 
-int main(){
+int main(int argc, char** argv){
+    bool print_flag = false;
+    if (argc > 1){
+        if (string(argv[1]) == "-v"){
+            print_flag = true;
+        }
+    }
+
     int POPULATION_SIZE;
     int NUM_OF_GENERATIONS;
     cout << "Select population size: ";
@@ -22,7 +29,7 @@ int main(){
     generatePopulation(population_arr, puzzle, POPULATION_SIZE, random);
 
     // Step 2-6 
-    evolve(population_arr, NUM_OF_GENERATIONS, POPULATION_SIZE, duplicatesMap, map_of_tiles, random);
+    evolve(population_arr, NUM_OF_GENERATIONS, POPULATION_SIZE, duplicatesMap, map_of_tiles, random, print_flag);
 
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
