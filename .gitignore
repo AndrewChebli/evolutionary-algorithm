@@ -6,3 +6,9 @@
 
 # TXT files
 *.txt
+
+# plist
+*.plist
+
+# yml
+*.yml
