@@ -636,8 +636,10 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int stagnated_generation_count = 0;
     const int stagnation_threshold = 1000;
     float ratio = 0.25;
+    int ratio_adjusted_pop_size = POPULATION_SIZE * ratio;
+    ratio_adjusted_pop_size = ratio_adjusted_pop_size % 2 == 0 ? ratio_adjusted_pop_size : ratio_adjusted_pop_size + 1;
     int** best_puzzle_so_far = allocatePuzzle();
-    int*** offspring_arr = allocatePopulation(POPULATION_SIZE * ratio);
+    int*** offspring_arr = allocatePopulation(ratio_adjusted_pop_size);
     //while (min_edge_mismatch_count != 0){
     while (generations_performed <= NUM_OF_GENERATIONS){
         //refreshing random gen
@@ -671,13 +673,13 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         }
         
         // Step 4: Select Parents
-        pair<vector<int>, vector<int>> parents_and_worst_indexes_pair = selectParentsAndWorst(population_arr, POPULATION_SIZE, sorted_index_by_fitness_vec, ratio);
+        pair<vector<int>, vector<int>> parents_and_worst_indexes_pair = selectParentsAndWorst(population_arr, POPULATION_SIZE, sorted_index_by_fitness_vec, ratio_adjusted_pop_size);
         vector<int> parent_index_vec = parents_and_worst_indexes_pair.first;
         vector<int> worst_index_vec = parents_and_worst_indexes_pair.second;
 
         // Step 5: Offspring generation
         crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap, map_of_tiles, sorted_index_by_fitness_vec.back().second, random);
-        mutate(offspring_arr, POPULATION_SIZE * ratio, random);
+        mutate(offspring_arr, ratio_adjusted_pop_size, random);
 
         // Step 6: Survivor Selection
         selectSurvivorsAndReplace(population_arr, POPULATION_SIZE, worst_index_vec, offspring_arr);
@@ -791,11 +793,11 @@ vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATI
     return sorted_index_by_fitness_vec;
 }
 
-pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const float ratio){
+pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const int ratio_adjusted_pop_size){
     
     // ratio is percentage of top ranking puzzles to select as parents
-    int starting_point_parents = POPULATION_SIZE - POPULATION_SIZE * ratio;
-    int threshold_worst = POPULATION_SIZE * ratio;
+    int starting_point_parents = POPULATION_SIZE - ratio_adjusted_pop_size;
+    int threshold_worst = ratio_adjusted_pop_size;
 
     vector<int> parents_index_vec;
     for (int i = starting_point_parents; i < POPULATION_SIZE; i++){

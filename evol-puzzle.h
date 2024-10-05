@@ -308,7 +308,7 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
  */
 vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE);
 
-pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const float ratio);
+pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const int ratratio_adjusted_pop_sizeio);
 
 void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, const vector<int> &worst_index_vec, int*** offspring_arr);
 
