@@ -801,7 +801,7 @@ pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, cons
 
     vector<int> parents_index_vec(ratio_adjusted_pop_size);
     for (int i = starting_point_parents; i < POPULATION_SIZE; i++){
-        parents_index_vec[i] = sorted_index_by_fitness_vec[i].first;
+        parents_index_vec[i - starting_point_parents] = sorted_index_by_fitness_vec[i].first;
     }
 
     vector<int> worst_index_vec(ratio_adjusted_pop_size);
