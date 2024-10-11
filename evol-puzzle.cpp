@@ -634,14 +634,25 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int min_edge_mismatch_count = INT_MAX;
     int generations_performed = 1;
     int stagnated_generation_count = 0;
-    const int stagnation_threshold = 1000;
-    int mutation_rate = 32;
+    int stagnation_threshold = 1000;
+    stagnation_threshold = max(10, (stagnation_threshold/POPULATION_SIZE) * stagnation_threshold);
+    const int MAX_MUTATION_RATE = 32;
+    const int MAX_MISMATCH = 112;
+    int mutation_rate = MAX_MUTATION_RATE;
     float ratio = 0.25;
     int ratio_adjusted_pop_size = POPULATION_SIZE * ratio;
     ratio_adjusted_pop_size = ratio_adjusted_pop_size % 2 == 0 ? ratio_adjusted_pop_size : ratio_adjusted_pop_size + 1;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(ratio_adjusted_pop_size);
     int current_edge_mismatch = min_edge_mismatch_count;
+    int last_gen_best_edge_mismatch = INT_MAX;
+    
+    // creating lookup table for variable mismatch_rate based on edge mismatch count
+    int mutation_rate_lut[MAX_MISMATCH];
+    float inverse_max_mismatch = 1.0f/MAX_MISMATCH;
+    for (int i = 0; i < MAX_MISMATCH; i++){
+        mutation_rate_lut[i] = max(3, (int)(i * inverse_max_mismatch * MAX_MUTATION_RATE));
+    }
 
     //while (min_edge_mismatch_count != 0){
     while (generations_performed <= NUM_OF_GENERATIONS){
@@ -673,9 +684,11 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         }
 
         min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
-        if(current_edge_mismatch != min_edge_mismatch_count){
-            current_edge_mismatch = min_edge_mismatch_count;
-            mutation_rate = max(12, mutation_rate - 2);
+        
+        // dynamically changing mutation_rate
+        if (sorted_index_by_fitness_vec.back().second != last_gen_best_edge_mismatch){
+            last_gen_best_edge_mismatch = sorted_index_by_fitness_vec.back().second;
+            mutation_rate = mutation_rate_lut[last_gen_best_edge_mismatch];
         }
 
         // Step 3: Termination Criteria (either best solution found or all generations elapsed)
@@ -697,7 +710,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
 
         if (print_flag){
             cout << "GEN " << generations_performed << " " << " edge mismatch: "  << sorted_index_by_fitness_vec.back().second \
-            << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
+            << " ... mutation rate: " << mutation_rate << " ... lowest edge mismatch: " << min_edge_mismatch_count << endl;
         }
         
         generations_performed++;
@@ -762,14 +775,14 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
     for (int i = 0; i < parent_index_vec_size; i += 2) {
         if (i + 1 < parent_index_vec_size) {
             copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
-            copyPuzzle(population_arr[parent_index_vec[i + 1]], offspring2);
+            copyPuzzle(population_arr[parent_index_vec[parent_index_vec_size - i -1]], offspring2);
 
-            // if (min_edge_mismatch_count <= 30){
-            //     orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
-            // }
+            if (min_edge_mismatch_count <= 15){
+                orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
+            }
 
             copyPuzzle(offspring1, offspring_arr[i]);
-            copyPuzzle(offspring2, offspring_arr[i + 1]);
+            copyPuzzle(offspring2, offspring_arr[parent_index_vec_size - i -1]);
         }
     }
 
