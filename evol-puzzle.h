@@ -54,6 +54,16 @@ constexpr int TILE_SIZE = 4;
  */
 constexpr int TILES_IN_PUZZLE_COUNT = 64;
 
+/**
+ * @brief Generates a random number generator and a uniform integer distribution.
+ * 
+ * This function uses the high-resolution clock to seed a Mersenne Twister 
+ * random number generator. It also creates a uniform integer distribution 
+ * ranging from 0 to TILES_IN_PUZZLE_COUNT - 1.
+ * 
+ * @return A pair consisting of a seeded mt19937 generator and a uniform 
+ * integer distribution.
+ */
 pair<mt19937, uniform_int_distribution<int>> getRandomGen();
 
 /**
@@ -101,6 +111,18 @@ vector<int> convertTileToVector(int arr[]);
 string convertTileToString(vector<int> vec);
 
 /**
+ * @brief Converts an array of integers representing a tile to a string.
+ * 
+ * This function takes an array of integers and concatenates each integer
+ * into a single string. The size of the array is determined by the constant
+ * TILE_SIZE.
+ * 
+ * @param arr An array of integers representing the tile.
+ * @return A string representation of the tile.
+ */
+string convertTileToString(int arr[]);
+
+/**
  * @brief Records duplicate tiles in a puzzle.
  *
  * This function takes a 2D array representing a puzzle and records the number of duplicate tiles.
@@ -112,9 +134,76 @@ string convertTileToString(vector<int> vec);
  */
 unordered_map<string, int> recordDuplicateTiles(int** puzzle);
 
+/**
+ * @brief Builds a map of tiles from a given puzzle.
+ *
+ * This function takes a 2D array representing a puzzle and constructs an unordered map
+ * where each unique tile (and its rotations) is mapped to its string representation.
+ *
+ * @param puzzle A 2D array of integers representing the puzzle tiles.
+ * @return An unordered_map where the key is the string representation of a tile (or its rotations)
+ *         and the value is the original string representation of the tile.
+ */
+unordered_map <string, string> buildMapOfTiles(int** puzzle);
+
+/**
+ * @brief Builds a map of tile strings and their counts from a given puzzle.
+ *
+ * This function processes a 2D puzzle array and generates a map where each key is a string 
+ * representation of a tile (or its rotations) and the value is the count of how many times 
+ * that tile (or its rotations) appears in the specified range of the puzzle.
+ *
+ * @param puzzle A 2D array representing the puzzle.
+ * @param start_index The starting index of the range in the puzzle to process.
+ * @param end_index The ending index of the range in the puzzle to process.
+ * @return An unordered_map where keys are string representations of tiles and values are their counts.
+ */
 unordered_map <string, int> buildMapOfTiles(int** puzzle, const int start_index, const int end_index);
 
-unordered_map <string, string> buildMapOfTiles(int** puzzle);
+/**
+ * @brief Checks if any rotation of a given tile is present in the provided map.
+ *
+ * This function takes a map and a tile, generates all possible rotations of the tile,
+ * and checks if any of these rotations exist in the map. If a match is found, it returns
+ * a pair containing true and the matching rotation string. If no match is found, it returns
+ * a pair containing false and an empty string.
+ *
+ * @param map_to_search The unordered map to search for the tile rotations.
+ * @param tile The tile represented as a vector of integers.
+ * @return A pair where the first element is a boolean indicating if a match was found,
+ *         and the second element is the matching rotation string if a match was found,
+ *         or an empty string if no match was found.
+ */
+pair<bool, string> isTileInMap(const unordered_map<string, int> &map_to_search, vector<int> tile);
+
+/**
+ * @brief Checks if a tile is present in the given map.
+ * 
+ * This function searches for a specified tile in an unordered map and returns
+ * a pair indicating whether the tile was found and the tile itself if found.
+ * 
+ * @param map_to_search The unordered map to search within.
+ * @param tile The tile to search for in the map.
+ * @return A pair where the first element is a boolean indicating if the tile
+ *         was found (true if found, false otherwise), and the second element
+ *         is the tile itself if found, or an empty string if not found.
+ */
+pair<bool, string> isTileInMap(const unordered_map<string, int> &map_to_search, string tile);
+
+/**
+ * @brief Checks if a tile is present in the given map and returns its corresponding value.
+ *
+ * This function searches for a specified tile in the provided unordered map. If the tile is found,
+ * it returns a pair containing `true` and the value associated with the tile. If the tile is not found,
+ * it returns a pair containing `false` and an empty string.
+ *
+ * @param map_to_search The unordered map to search for the tile.
+ * @param tile The tile to search for in the map.
+ * @return A pair where the first element is a boolean indicating whether the tile was found,
+ *         and the second element is the value associated with the tile if found, or an empty string if not found.
+ */
+pair<bool, string> isTileInMap(const unordered_map<string, string> &map_to_search, string tile);
+
 /**
  * @brief Swaps two random tiles in a 2D array.
  *
@@ -182,14 +271,16 @@ int** allocatePuzzle();
 void freePuzzle(int** puzzle);
 
 /**
- * @brief Frees the memory allocated for a population array.
- * 
- * This function deallocates the memory used by a 3D array representing a population.
- * It iterates through the population array and frees each sub-array before freeing
- * the main population array itself.
- * 
- * @param population_arr A pointer to the 3D array representing the population.
- * @param population_size The size of the population (number of individuals).
+ * @brief Frees the memory allocated for a population of puzzle solutions.
+ *
+ * This function deallocates the memory used by a 3D array representing a population
+ * of puzzle solutions. It iterates through each solution in the population, freeing
+ * the memory allocated for each tile and then freeing the memory allocated for each
+ * solution. Finally, it frees the memory allocated for the population array itself.
+ *
+ * @param population_arr A pointer to a 3D array representing the population of puzzle solutions.
+ *                       The array is of size [population_size][TILES_IN_PUZZLE_COUNT][TILE_SIZE].
+ * @param population_size The number of solutions in the population.
  */
 void freePopulation(int*** population_arr, int population_size);
 
@@ -308,18 +399,96 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
  */
 vector<pair<int, int>> evaluateFitness(int*** population_arr, const int POPULATION_SIZE);
 
+/**
+ * @brief Selects the indices of the parent puzzles and the worst puzzles from the population.
+ * 
+ * This function selects the top-ranking puzzles as parents and the bottom-ranking puzzles as the worst
+ * based on their fitness values. The selection is done using a sorted index vector.
+ * 
+ * @param population_arr A 3D array representing the population of puzzles.
+ * @param POPULATION_SIZE The total size of the population.
+ * @param sorted_index_by_fitness_vec A vector of pairs where each pair contains an index and its corresponding fitness value, sorted by fitness.
+ * @param ratio_adjusted_pop_size The number of top-ranking puzzles to select as parents and the number of bottom-ranking puzzles to select as worst.
+ * 
+ * @return A pair of vectors:
+ *         - The first vector contains the indices of the selected parent puzzles.
+ *         - The second vector contains the indices of the selected worst puzzles.
+ */
 pair<vector<int>, vector<int>> selectParentsAndWorst(int*** population_arr, const int POPULATION_SIZE, const vector<pair<int, int>> &sorted_index_by_fitness_vec, const int ratratio_adjusted_pop_sizeio);
 
+/**
+ * @brief Replaces the worst individuals in the population with new offspring.
+ *
+ * This function takes the worst individuals in the population, as indicated by their indices,
+ * and replaces them with the corresponding offspring. The replacement is done in-place.
+ *
+ * @param population_arr A pointer to the 3D array representing the current population.
+ * @param POPULATION_SIZE The size of the population.
+ * @param worst_index_vec A vector containing the indices of the worst individuals in the population.
+ * @param offspring_arr A pointer to the 3D array representing the new offspring.
+ */
 void selectSurvivorsAndReplace(int*** population_arr, const int POPULATION_SIZE, const vector<int> &worst_index_vec, int*** offspring_arr);
 
-int calculateDiversity(int*** population_arr, const int POPULATION_SIZE);
-
+/**
+ * @brief Copies the contents of one puzzle to another.
+ * 
+ * This function copies the contents of the source puzzle to the destination puzzle.
+ * Both puzzles are assumed to be 2D arrays with dimensions TILES_IN_PUZZLE_COUNT x TILE_SIZE.
+ * 
+ * @param source_puzzle A pointer to the source puzzle (2D array) to copy from.
+ * @param dest_puzzle A pointer to the destination puzzle (2D array) to copy to.
+ */
 void copyPuzzle(int** source_puzzle, int** copy_puzzle);
 
+/**
+ * @brief Copies the contents of one tile to another.
+ * 
+ * This function copies the contents of the source tile array to the destination tile array.
+ * It assumes that both arrays have a size of TILE_SIZE.
+ * 
+ * @param source_tile Pointer to the source tile array.
+ * @param dest_tile Pointer to the destination tile array.
+ */
 void copyTile(int* source_tile, int* dest_tile);
 
+/**
+ * @brief Copies a source puzzle into each element of a destination population.
+ * 
+ * This function iterates over a population array and copies the source puzzle 
+ * into each individual in the population. The population is represented as a 
+ * 3D array where each individual is a 2D array (puzzle).
+ * 
+ * @param destination_population A 3D array representing the population where 
+ *        each individual is a 2D array (puzzle) to be filled with the source puzzle.
+ * @param POPULATION_SIZE The number of individuals in the population.
+ * @param source_puzzle A 2D array representing the puzzle to be copied into 
+ *        each individual of the population.
+ */
 void writePuzzleIntoPopulation(int***, const int POPULATION_SIZE, int**);
 
+/**
+ * @brief Prints the puzzle in a formatted manner.
+ * 
+ * This function takes a 2D array representing a puzzle and prints it to the console.
+ * Each tile in the puzzle is printed in a row, and a new line is started after every 8 tiles.
+ * 
+ * @param puzzle A 2D array representing the puzzle, where each sub-array is a tile.
+ */
 void printPuzzle(int** puzzle);
 
+/**
+ * @brief Saves the puzzle state to a file in the "output" directory.
+ *
+ * This function creates an "output" directory if it does not already exist.
+ * It then generates a filename based on the current date and time, and the
+ * provided edge mismatch count. The puzzle state is written to this file.
+ *
+ * @param puzzle A 2D array representing the puzzle state.
+ * @param edge_mismatch_count The count of edge mismatches in the puzzle.
+ *
+ * @note The function assumes that the puzzle is a square grid with a size
+ *       defined by TILES_IN_PUZZLE_COUNT and TILE_SIZE.
+ * @note The function will output an error message to std::cerr if it fails
+ *       to create the directory or open the file for writing.
+ */
 void savePuzzle(int** puzzle, int edge_mismatch_count);
