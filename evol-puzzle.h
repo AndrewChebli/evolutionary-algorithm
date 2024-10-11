@@ -279,7 +279,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  * - Rotates a randomly selected tile to the left by one index.
  * - Swaps tiles within the puzzle.
  */
-void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random);
+void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random, int mutation_rate);
 
 /**
  * @brief Performs crossover operation on a population array.

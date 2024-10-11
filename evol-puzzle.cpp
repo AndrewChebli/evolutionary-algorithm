@@ -635,11 +635,14 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
     int generations_performed = 1;
     int stagnated_generation_count = 0;
     const int stagnation_threshold = 1000;
+    int mutation_rate = 32;
     float ratio = 0.25;
     int ratio_adjusted_pop_size = POPULATION_SIZE * ratio;
     ratio_adjusted_pop_size = ratio_adjusted_pop_size % 2 == 0 ? ratio_adjusted_pop_size : ratio_adjusted_pop_size + 1;
     int** best_puzzle_so_far = allocatePuzzle();
     int*** offspring_arr = allocatePopulation(ratio_adjusted_pop_size);
+    int current_edge_mismatch = min_edge_mismatch_count;
+
     //while (min_edge_mismatch_count != 0){
     while (generations_performed <= NUM_OF_GENERATIONS){
         //refreshing random gen
@@ -670,6 +673,10 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
         }
 
         min_edge_mismatch_count = min(min_edge_mismatch_count, sorted_index_by_fitness_vec.back().second);
+        if(current_edge_mismatch != min_edge_mismatch_count){
+            current_edge_mismatch = min_edge_mismatch_count;
+            mutation_rate = max(12, mutation_rate - 2);
+        }
 
         // Step 3: Termination Criteria (either best solution found or all generations elapsed)
         if (min_edge_mismatch_count == 0){
@@ -683,7 +690,7 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
 
         // Step 5: Offspring generation
         crossover(population_arr, POPULATION_SIZE, parent_index_vec, offspring_arr, duplicatesMap, map_of_tiles, sorted_index_by_fitness_vec.back().second, random);
-        mutate(offspring_arr, ratio_adjusted_pop_size, random);
+        mutate(offspring_arr, ratio_adjusted_pop_size, random, mutation_rate);
 
         // Step 6: Survivor Selection
         selectSurvivorsAndReplace(population_arr, POPULATION_SIZE, worst_index_vec, offspring_arr);
@@ -717,13 +724,13 @@ void evolve(int*** population_arr, int NUM_OF_GENERATIONS, const int POPULATION_
  * - Rotates a randomly selected tile to the left by one index.
  * - Swaps tiles within the puzzle.
  */
-void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random){
+void mutate(int*** offspring_arr, const int POPULATION_SIZE, pair<mt19937, uniform_int_distribution<int>> random, int mutation_rate){
     for (int i = 0; i < POPULATION_SIZE; i++){
         // if (random.second(random.first) % 8 <= 2){
         //     continue;
         // }
         //int num_iterations = random.second(random.first) % 32;
-        int num_iterations = random.second(random.first) % 32;
+        int num_iterations = random.second(random.first) % mutation_rate;
         for (int j = 0; j < num_iterations; j++){
             if(j % 2 == 0) {
                 swapTile(offspring_arr[i], random);
