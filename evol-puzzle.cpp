@@ -868,7 +868,7 @@ void crossover(int*** population_arr, const int POPULATION_SIZE, const vector<in
             copyPuzzle(population_arr[parent_index_vec[i]], offspring1);
             copyPuzzle(population_arr[parent_index_vec[parent_index_vec_size - i -1]], offspring2);
 
-            if (min_edge_mismatch_count <= 15){
+            if (min_edge_mismatch_count <= 10){
                 orderCrossover(offspring1, offspring2, duplicatesMap, map_of_tiles, random);
             }
 
@@ -1078,6 +1078,7 @@ void savePuzzle(int** puzzle, int edge_mismatch_count) {
         return;
     }
 
+    file << "placeholder name id placeholder name id\n";
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; i++) {
         if (i % 8 == 0 && i != 0) {
             file << endl;
