@@ -406,11 +406,11 @@ void readInput(string filename, int** puzzle){
  * @return A pointer to the allocated 3D array representing the population.
  */
 int*** allocatePopulation(int population_size) {
-    int*** __restrict population = new int**[population_size];
+    int*** population = new int**[population_size];
     for (int i = 0; i < population_size; ++i) {
-        population[i] __restrict = new int*[TILES_IN_PUZZLE_COUNT];
+        population[i] = new int*[TILES_IN_PUZZLE_COUNT];
         for (int j = 0; j < TILES_IN_PUZZLE_COUNT; ++j) {
-            population[i][j] __restrict = new int[TILE_SIZE];
+            population[i][j] = new int[TILE_SIZE];
         }
     }
     return population;
@@ -429,9 +429,9 @@ int*** allocatePopulation(int population_size) {
  * @return int** A pointer to the allocated 2D array representing the puzzle.
  */
 int** allocatePuzzle() {
-    int** __restrict puzzle = new int*[TILES_IN_PUZZLE_COUNT];
+    int** puzzle = new int*[TILES_IN_PUZZLE_COUNT];
     for (int i = 0; i < TILES_IN_PUZZLE_COUNT; ++i) {
-        puzzle[i] __restrict = new int[TILE_SIZE];
+        puzzle[i] = new int[TILE_SIZE];
     }
     return puzzle;
 }
