@@ -1,5 +1,26 @@
+/**
+ * @file main.cpp
+ * @brief Main entry point for the puzzle solver application.
+ * 
+ * This file contains the main function which initializes the puzzle solver,
+ * reads input, generates an initial population, and evolves the population
+ * over a specified number of generations.
+ * 
+ * @details
+ * The program expects an optional command-line argument:
+ * - `-v` : Enables verbose output.
+ * 
+ * The user is prompted to input the population size and the number of generations.
+ * The program then measures the time taken to evolve the population and outputs
+ * the elapsed time.
+ * 
+ * @param argc Number of command-line arguments.
+ * @param argv Array of command-line arguments.
+ * @return int Exit status of the program.
+ */
 #include <iostream>
 #include "evol-puzzle.h"
+
 
 int main(int argc, char** argv){
     bool print_flag = false;
