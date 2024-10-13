@@ -14,8 +14,14 @@
 #include <algorithm>
 #include <utility>
 #include <cmath>
-#include <sys/stat.h>
-#include <sys/types.h>
+
+#ifdef _WIN32
+    #include <direct.h> // windows mkdir
+#else
+    #include <sys/stat.h> // posix mkdir
+    #include <sys/types.h> 
+#endif
+
 using namespace std;
 /*
 Problem Description. Your program must attempt to solve an 8x8 square puzzle containing 64

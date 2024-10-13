@@ -1055,7 +1055,12 @@ void printPuzzle(int** puzzle){
  *       to create the directory or open the file for writing.
  */
 void savePuzzle(int** puzzle, int edge_mismatch_count) {
-    int status = mkdir("output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    #ifdef _WIN32
+        int status = _mkdir("output");
+    #else
+        int status = mkdir("output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    #endif
+    
     if (status != 0 && errno != EEXIST) {
         cerr << "Unable to create directory 'output'";
         return;
