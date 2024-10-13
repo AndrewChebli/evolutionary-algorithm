@@ -11,7 +11,7 @@ int main(int argc, char** argv){
 
     int POPULATION_SIZE;
     int NUM_OF_GENERATIONS;
-    cout << "Select population size: ";
+    cout << "\n\nSelect population size: ";
     cin >> POPULATION_SIZE;
     cout << "Select number of generations: ";
     cin >> NUM_OF_GENERATIONS;
