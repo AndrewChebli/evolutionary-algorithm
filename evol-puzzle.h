@@ -38,10 +38,6 @@ represents the right edge, the third number represents the bottom edge, and the 
 represents the left edge.
 */
 
-/*
-The puzzle will be represented as a 1D array of 64 elements. Each element/tile will be a 4-element array.
-*/
-
 
 /**
  * @brief The size of each tile in the puzzle.
