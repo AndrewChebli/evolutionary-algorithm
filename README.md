@@ -4,18 +4,18 @@
 This project implements an evolutionary algorithm to solve an 8x8 square puzzle consisting of 64 square pieces. Each piece (tile) has 4 edges with motifs (patterns or colors), and the goal is to arrange the tiles such that adjacent edges have matching motifs.
 
 ## Table of Contents
-- Description
-- Files
-  - main.cpp
-  - evol-puzzle.h
-  - evol-puzzle.cpp
-- How to Compile
-- How to Run
-- Input File
-- Command-Line Arguments
-- Output
-- Dependencies
-- License
+- [Description](#description)
+- [Files](#files)
+  - [main.cpp](#maincpp)
+  - [evol-puzzle.h](#evol-puzzleh)
+  - [evol-puzzle.cpp](#evol-puzzlecpp)
+- [How to Compile](#how-to-compile-and-run)
+- [How to Run](#how-to-run)
+- [Input File](#input-file)
+- [Command-Line Arguments](#command-line-arguments)
+- [Output](#output)
+- [Dependencies](#dependencies)
+- [License](#license)
 
 ## Description
 The puzzle consists of arranging 64 square tiles in an 8x8 grid. Each tile has four edges, each marked with a motif represented by a digit from 0 to 6 (total of 7 motifs). The objective is to place and orient the tiles so that adjacent edges have matching motifs.
