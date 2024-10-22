@@ -189,3 +189,6 @@ Note: The output files contain the puzzle state and can be used for analysis or 
 
 ## License
 This project is released under the MIT License.
+
+![Visitor Count](https://img.shields.io/badge/dynamic/json?label=Visitors&query=value&url=https://api.countapi.xyz/hit/AndrewChebli/evolutionary-algorithm)
+
