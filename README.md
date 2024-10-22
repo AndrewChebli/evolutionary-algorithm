@@ -16,6 +16,7 @@ This project implements an evolutionary algorithm to solve an 8x8 square puzzle 
 - [Output](#output)
 - [Dependencies](#dependencies)
 - [License](#license)
+- [Visitor Count](#visitor-count)
 
 ## Description
 The puzzle consists of arranging 64 square tiles in an 8x8 grid. Each tile has four edges, each marked with a motif represented by a digit from 0 to 6 (total of 7 motifs). The objective is to place and orient the tiles so that adjacent edges have matching motifs.
@@ -190,5 +191,6 @@ Note: The output files contain the puzzle state and can be used for analysis or 
 ## License
 This project is released under the MIT License.
 
-![Visitor Count](https://img.shields.io/badge/dynamic/json?label=Visitors&query=value&url=https://api.countapi.xyz/hit/AndrewChebli/evolutionary-algorithm)
+## Visitor Count:
+![Visitor Count](https://profile-counter.glitch.me/AndrewChebli-evolutionary-algorithm/count.svg)
 
